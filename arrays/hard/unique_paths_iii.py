@@ -64,9 +64,11 @@ class Solution:
         self.world = world
         return True
 
-    def uniquePathsIII(self, grid: List[List[int]], path=None, start=None) -> int:
-        initial = self.init_world(grid)
+    def uniquePathsIII(self, grid: List[List[int]]) -> int:
+        self.init_world(grid)
+        return len(self._get_unique_path(grid))
 
+    def _get_unique_path(self, grid: List[List[int]], path=None, start=None) -> set:
         visited = self.visited
         start = start or self.start
         path = path or tuple()
@@ -82,26 +84,22 @@ class Solution:
 
             if self.end == node:
                 if path is None:
-                    return len(unique_paths)
+                    return unique_paths
 
                 unique_paths.add(path)
-                # return path + [node]
                 continue
 
             neighboors = self.get_possible_directions(node)
             if DEBUG:
                 neighboors = list(neighboors)
-            _ = 0
+
             for neighboor in neighboors:
                 if neighboor in visited:
                     continue
 
-                # to_visit.append(neighboor)
-                paths = self.__class__(self.world, visited).uniquePathsIII(grid, path, neighboor)
+                paths = self.__class__(self.world, visited)._get_unique_path(grid, path, neighboor)
                 unique_paths = unique_paths.union(paths)
 
-        if initial:
-            return len(unique_paths)
         return unique_paths
 
 
