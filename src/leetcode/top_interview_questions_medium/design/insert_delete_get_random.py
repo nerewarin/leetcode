@@ -10,7 +10,7 @@ int getRandom() Returns a random element from the current set of elements (it's 
 You must implement the functions of the class such that each function works in average O(1) time complexity.
 
 """
-import collections
+
 import random
 
 
@@ -54,8 +54,8 @@ import random
 #     index = random.randint(0, len(self.vals) - 1)
 #     return self.vals[index]
 
-class RandomizedSet:
 
+class RandomizedSet:
     def __init__(self):
         self.vals = set([])
 
@@ -77,9 +77,18 @@ class RandomizedSet:
         return random.choice(list(self.vals))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     r = RandomizedSet()
-    ["RandomizedSet", "insert", "remove", "insert", "getRandom", "remove", "insert", "getRandom"]
+    [
+        "RandomizedSet",
+        "insert",
+        "remove",
+        "insert",
+        "getRandom",
+        "remove",
+        "insert",
+        "getRandom",
+    ]
     [[], [1], [2], [2], [], [1], [2], []]
     # Output
     # [null, true, false, true, 2, true, false, 2]

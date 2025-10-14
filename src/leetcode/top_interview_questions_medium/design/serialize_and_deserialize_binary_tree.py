@@ -26,7 +26,6 @@ The number of nodes in the tree is in the range [0, 104].
 -1000 <= Node.val <= 1000
 
 """
-import collections
 
 # Definition for a binary tree node.
 # class TreeNode(object):
@@ -35,11 +34,10 @@ import collections
 #         self.left = None
 #         self.right = None
 
-class Codec:
 
+class Codec:
     def serialize(self, root):
-        """Encodes a tree to a single string.
-        """
+        """Encodes a tree to a single string."""
         if not root:
             return ""
         #
@@ -63,7 +61,7 @@ class Codec:
 
         ans = []
         for el in data.split(","):
-            if el == 'None':
+            if el == "None":
                 e = None
             else:
                 e = int(el)
@@ -71,14 +69,11 @@ class Codec:
         return ans
 
 
-
-
-
 # Your Codec object will be instantiated and called as such:
 # ser = Codec()
 # deser = Codec()
 # ans = deser.deserialize(ser.serialize(root))
-if __name__ == '__main__':
+if __name__ == "__main__":
     ser = Codec()
     deser = Codec()
     root = [1, 2, 3, None, None, 4, 5]

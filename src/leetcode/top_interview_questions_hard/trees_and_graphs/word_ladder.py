@@ -33,6 +33,7 @@ beginWord != endWord
 All the words in wordList are unique.
 
 """
+
 import collections
 import string
 from typing import List
@@ -54,7 +55,7 @@ class Solution:
                 for i, cache in enumerate(letters):
                     for c in string.ascii_lowercase:
                         letters[i] = c
-                        word = ''.join(letters)
+                        word = "".join(letters)
                         if word == endWord:
                             return ans + 1
                         if word in wordSet:
@@ -65,9 +66,15 @@ class Solution:
         return 0
 
 
-if __name__ == '__main__':
-    r = Solution().ladderLength(beginWord = "hit", endWord = "cog", wordList= ["hot", "dot", "dog", "lot", "log", "cog"])
+if __name__ == "__main__":
+    r = Solution().ladderLength(
+        beginWord="hit",
+        endWord="cog",
+        wordList=["hot", "dot", "dog", "lot", "log", "cog"],
+    )
     assert r == 5
 
-    r = Solution().ladderLength(beginWord = "hit", endWord = "cog", wordList= ["hot", "dot", "dog", "lot", "log"])
+    r = Solution().ladderLength(
+        beginWord="hit", endWord="cog", wordList=["hot", "dot", "dog", "lot", "log"]
+    )
     assert r == 0

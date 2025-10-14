@@ -1,12 +1,12 @@
 from typing import List, Optional, Set
 import unittest
 import collections
-import itertools
 
 DEBUG = False
 
+
 class Solution:
-    def __init__(self, world=None, visited: Optional[Set[int]]=None):
+    def __init__(self, world=None, visited: Optional[Set[int]] = None):
         self.world = world
 
         self.visited = set([])
@@ -37,9 +37,7 @@ class Solution:
         return xy in self.emptiness
 
     def get_possible_directions(self, xy):
-        for x, y in (
-                (1, 0), (0, 1), (-1, 0), (0, -1)
-        ):
+        for x, y in ((1, 0), (0, 1), (-1, 0), (0, -1)):
             p = xy[0] + x, xy[1] + y
             if p in self.visited:
                 continue
@@ -73,13 +71,13 @@ class Solution:
         start = start or self.start
         path = path or tuple()
 
-        to_visit = collections.deque()
+        to_visit: collections.deque = collections.deque()
         to_visit.append(start)
 
         unique_paths = set([])
         while to_visit:
             node = to_visit.popleft()
-            path += (node, )
+            path += (node,)
             visited.add(node)
 
             if self.end == node:
@@ -97,7 +95,9 @@ class Solution:
                 if neighboor in visited:
                     continue
 
-                paths = self.__class__(self.world, visited)._get_unique_path(grid, path, neighboor)
+                paths = self.__class__(self.world, visited)._get_unique_path(
+                    grid, path, neighboor
+                )
                 unique_paths = unique_paths.union(paths)
 
         return unique_paths
@@ -111,14 +111,7 @@ class Test(unittest.TestCase):
         DEBUG = False
 
     def test1(self):
-        self._run(
-            grid=[
-                [1, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 2, -1]
-            ],
-            output=2
-        )
+        self._run(grid=[[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 2, -1]], output=2)
 
     def test2(self):
         self._run(grid=[[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 2]], output=4)

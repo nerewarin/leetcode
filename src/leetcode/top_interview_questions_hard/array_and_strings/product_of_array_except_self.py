@@ -28,8 +28,8 @@ The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit int
 
 Follow up: Can you solve the problem in O(1) extra space complexity? (The output array does not count as extra space for space complexity analysis.)
 """
-from typing import List
 
+from typing import List
 
 
 class Solution:
@@ -58,16 +58,16 @@ class Solution:
 
             # For every index i update prefix[i] as prefix[i] = prefix[i-1] * array[i-1],
             # i.e store the product upto i-1 index from the start of array.
-            prefix[i] = prefix[i - 1] * nums[i-1]
+            prefix[i] = prefix[i - 1] * nums[i - 1]
 
-            suffix[j] = suffix[j + 1] * nums[j+1]
+            suffix[j] = suffix[j + 1] * nums[j + 1]
 
         return [prefix[i] * suffix[i] for i in range(l)]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for in_, out in (
-                            ([1, 2, 3], [6, 3, 2]),
-                            ([3, 2, 1], [2, 3, 6]),
+        ([1, 2, 3], [6, 3, 2]),
+        ([3, 2, 1], [2, 3, 6]),
     ):
         assert Solution.productExceptSelf(in_) == out, f"expected {out=} for {in_=}"

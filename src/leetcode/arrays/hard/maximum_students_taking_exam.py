@@ -1,8 +1,8 @@
 """
 https://leetcode.com/problems/maximum-students-taking-exam/description/
 """
+
 import unittest
-from typing import List
 
 
 class Solution:
@@ -63,15 +63,18 @@ class Solution:
         m, n = len(seats), len(seats[0])
 
         def can_place(i, j):
-            if seats[i][j] == '#' or (j > 0 and seats[i][j - 1] == 'S') or (
-                    j < n - 1 and seats[i][j + 1] == 'S') or (
-                    i > 0 and j > 0 and seats[i - 1][j - 1] == 'S') or (
-                    i > 0 and j < n - 1 and seats[i - 1][j + 1] == 'S'):
+            if (
+                seats[i][j] == "#"
+                or (j > 0 and seats[i][j - 1] == "S")
+                or (j < n - 1 and seats[i][j + 1] == "S")
+                or (i > 0 and j > 0 and seats[i - 1][j - 1] == "S")
+                or (i > 0 and j < n - 1 and seats[i - 1][j + 1] == "S")
+            ):
                 return False
             return True
 
         def count_students(seating):
-            return sum(row.count('S') for row in seating)
+            return sum(row.count("S") for row in seating)
 
         def backtrack(seating, row):
             if row == m:
@@ -80,21 +83,20 @@ class Solution:
             max_students = 0
             for j in range(n):
                 if can_place(row, j):
-                    seating[row][j] = 'S'
+                    seating[row][j] = "S"
                     max_students = max(max_students, backtrack(seating, row + 1))
-                    seating[row][j] = '.'
+                    seating[row][j] = "."
 
             return max_students
 
         return backtrack(seats, 0)
 
+
 class Test1(unittest.TestCase):
     def _test(self, data, expected):
         for row in data:
             print("".join(row))
-        res = (
-            Solution().maxStudents(data)
-        )
+        res = Solution().maxStudents(data)
         self.assertEqual(expected, res)
 
     def test1(self):
@@ -102,19 +104,14 @@ class Test1(unittest.TestCase):
             [
                 ["#", ".", "#", "#", ".", "#"],
                 [".", "#", "#", "#", "#", "."],
-                ["#", ".", "#", "#", ".", "#"]
+                ["#", ".", "#", "#", ".", "#"],
             ],
             4,
         )
 
     def test2(self):
         self._test(
-            [
-                [".", "#"],
-                ["#", "#"],
-                ["#", "."],
-                ["#", "#"],
-                [".", "#"]],
+            [[".", "#"], ["#", "#"], ["#", "."], ["#", "#"], [".", "#"]],
             3,
         )
 
@@ -125,18 +122,14 @@ class Test1(unittest.TestCase):
                 [".", "#", ".", "#", "."],
                 [".", ".", "#", ".", "."],
                 [".", "#", ".", "#", "."],
-                ["#", ".", ".", ".", "#"]
-            ]
-            , 10
+                ["#", ".", ".", ".", "#"],
+            ],
+            10,
         )
 
     def test4(self):
         self._test(
-            [
-                ["#", "#", "."],
-                ["#", ".", "."],
-                [".", ".", "#"]
-            ],
+            [["#", "#", "."], ["#", ".", "."], [".", ".", "#"]],
             3,
         )
 
@@ -147,7 +140,7 @@ class Test1(unittest.TestCase):
                 [".", ".", "#", ".", "."],
                 ["#", ".", "#", ".", "#"],
                 [".", ".", ".", ".", "."],
-                [".", ".", ".", "#", "."]
+                [".", ".", ".", "#", "."],
             ],
             9,
         )

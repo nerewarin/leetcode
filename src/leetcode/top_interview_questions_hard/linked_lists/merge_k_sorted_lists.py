@@ -38,6 +38,7 @@ k == lists.length
 lists[i] is sorted in ascending order.
 The sum of lists[i].length will not exceed 104.
 """
+
 from typing import List, Optional
 from queue import PriorityQueue
 
@@ -87,20 +88,12 @@ class Solution:
         return dummy.next
 
 
-if __name__ == '__main__':
-    r = Solution().mergeKLists([
-        ListNode(
-            1, ListNode(
-                4, ListNode(5)
-            )
-        ),
-        ListNode(
-            1, ListNode(
-                3, ListNode(4)
-            )
-        ),
-        ListNode(
-            2, ListNode(6)
-        ),
-    ])
+if __name__ == "__main__":
+    r = Solution().mergeKLists(
+        [
+            ListNode(1, ListNode(4, ListNode(5))),
+            ListNode(1, ListNode(3, ListNode(4))),
+            ListNode(2, ListNode(6)),
+        ]
+    )
     print(r)

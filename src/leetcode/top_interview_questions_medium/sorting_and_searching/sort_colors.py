@@ -28,7 +28,7 @@ nums[i] is either 0, 1, or 2.
 
 Follow up: Could you come up with a one-pass algorithm using only constant extra space?
 """
-from collections import Counter
+
 from typing import List
 
 
@@ -74,11 +74,11 @@ class Solution:
                 nums[two] = 2
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     a = [2, 0, 2, 1, 1, 0]
     Solution().sortColors(a)
     assert a == [0, 0, 1, 1, 2, 2]
 
-    a = [2,0,1]
+    a = [2, 0, 1]
     Solution().sortColors(a)
-    assert a == [0,1,2]
+    assert a == [0, 1, 2]
