@@ -41,7 +41,7 @@ class ListNode:
 
     @classmethod
     def create_nodes(cls, *lists: list[int]) -> tuple["ListNode", ...]:
-        return tuple(cls.from_list(l) for l in lists)
+        return tuple(cls.from_list(lst) for lst in lists)
 
     def as_list(self) -> list[int]:
         vals = [self.val]
@@ -56,7 +56,7 @@ class ListNode:
         return " -> ".join(map(str, self.as_list()))
 
     @staticmethod
-    def _add_digits(*values: tuple[int]) -> tuple[SingleDigitModel, OverflowModel]:
+    def _add_digits(*values: int) -> tuple[SingleDigitModel, OverflowModel]:
         overflow, value = divmod(sum(values), 10)
         return SingleDigitModel(value=value), OverflowModel(value=overflow)
 

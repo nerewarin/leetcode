@@ -74,7 +74,7 @@ class Solution:
         to_visit: collections.deque = collections.deque()
         to_visit.append(start)
 
-        unique_paths = set([])
+        unique_paths: Set[tuple] = set([])
         while to_visit:
             node = to_visit.popleft()
             path += (node,)

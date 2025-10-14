@@ -72,7 +72,7 @@ class Solution:
         # a = 0
         dummy = ListNode(0)
         curr = dummy
-        pq = PriorityQueue()
+        pq: PriorityQueue[tuple[int, int, ListNode]] = PriorityQueue()
 
         for i, lst in enumerate(lists):
             if lst:
