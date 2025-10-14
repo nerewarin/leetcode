@@ -26,7 +26,6 @@ class Solution:
         return True
 
     def canBeIncreasing(self, nums: List[int]) -> bool:
-        o = nums
         if len(set(nums)) < len(nums) - 1:
             return False
 
@@ -49,7 +48,7 @@ class Solution:
                 if len(set(f1)) == len(f1):
                     return True
                 else:
-                    z = 0
+                    pass
 
             f1 = list(nums)
             f1.remove(another)
@@ -61,13 +60,13 @@ class Solution:
                 if len(set(f1)) == len(f1):
                     return True
                 else:
-                    z = 0
+                    pass
 
         return False
 
 
 if __name__ == "__main__":
-    assert Solution().canBeIncreasing([2, 3, 4, 5, 1, 5]) == False
+    assert Solution().canBeIncreasing([2, 3, 4, 5, 1, 5]) is False
     assert (
         Solution().canBeIncreasing(
             [
@@ -171,10 +170,10 @@ if __name__ == "__main__":
                 981,
             ]
         )
-        == True
+        is True
     )
-    assert Solution().canBeIncreasing([1, 1, 1]) == False
-    assert Solution().canBeIncreasing([1, 1]) == True
-    assert Solution().canBeIncreasing([2, 3, 1, 2]) == False
-    assert Solution().canBeIncreasing([1, 2, 10, 5, 7]) == True
-    assert Solution().canBeIncreasing([105, 924, 32, 968]) == True
+    assert Solution().canBeIncreasing([1, 1, 1]) is False
+    assert Solution().canBeIncreasing([1, 1]) is True
+    assert Solution().canBeIncreasing([2, 3, 1, 2]) is False
+    assert Solution().canBeIncreasing([1, 2, 10, 5, 7]) is True
+    assert Solution().canBeIncreasing([105, 924, 32, 968]) is True

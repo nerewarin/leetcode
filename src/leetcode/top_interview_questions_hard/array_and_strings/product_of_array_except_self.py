@@ -45,12 +45,12 @@ class Solution:
 
         from here: https://www.geeksforgeeks.org/a-product-array-puzzle/
         """
-        l = len(nums)
-        prefix = [0] * l
-        suffix = [0] * l
+        length = len(nums)
+        prefix = [0] * length
+        suffix = [0] * length
 
         for i, num in enumerate(nums):
-            j = l - i - 1
+            j = length - i - 1
             if i == 0:
                 prefix[i] = 1
                 suffix[j] = 1
@@ -62,7 +62,7 @@ class Solution:
 
             suffix[j] = suffix[j + 1] * nums[j + 1]
 
-        return [prefix[i] * suffix[i] for i in range(l)]
+        return [prefix[i] * suffix[i] for i in range(length)]
 
 
 if __name__ == "__main__":

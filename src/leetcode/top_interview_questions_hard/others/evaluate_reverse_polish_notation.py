@@ -7,7 +7,7 @@ def do(tokens):
     for t in tokens:
         try:
             res = int(t)
-        except:
+        except ValueError:
             right = stack.pop()
             left = stack.pop()
             res = eval(f"{left} {t} {right}")
