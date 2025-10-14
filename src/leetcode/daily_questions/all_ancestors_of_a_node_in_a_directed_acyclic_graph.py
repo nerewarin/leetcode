@@ -5,14 +5,15 @@ https://leetcode.com/problems/all-ancestors-of-a-node-in-a-directed-acyclic-grap
 """
 
 from typing import List
+import unittest
 
 
 class Graph:
     def __init__(self, edges: List[List[int]]):
         self.edges = edges
-        self._ancestors = {}
+        self._ancestors: dict[int, list[int]] = {}
 
-    def get_ancestors(self, i):
+    def get_ancestors(self, i: int):
         if i in self._ancestors:
             return self._ancestors[i]
 
@@ -51,9 +52,6 @@ class Solution:
             res.append(r)
 
         return res
-
-
-import unittest
 
 
 class TestSolution(unittest.TestCase):
