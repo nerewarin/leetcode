@@ -2,6 +2,8 @@
 https://leetcode.com/problems/palindromic-substrings/?envType=daily-question&envId=2024-06-29
 """
 
+import unittest
+
 
 class Solution:
     def countSubstrings(self, s: str) -> int:
@@ -18,9 +20,6 @@ class Solution:
                     fringe.append((idx, candidate + s[idx + len(candidate)]))
 
         return len(subs)
-
-
-import unittest
 
 
 class TestSolution(unittest.TestCase):

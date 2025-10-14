@@ -1,10 +1,10 @@
 from typing import List
+import unittest
 
 
 class Solution:
     def maxDistance(self, position: List[int], m: int) -> int:
         position.sort()
-        original_position = list(position)
 
         p = len(position)
 
@@ -36,9 +36,6 @@ class Solution:
         place(position[-1])
 
         return calc_distance(placed)
-
-
-import unittest
 
 
 class TestSolution(unittest.TestCase):
