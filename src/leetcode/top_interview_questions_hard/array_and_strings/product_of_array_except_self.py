@@ -33,41 +33,31 @@ from typing import List
 
 
 class Solution:
-    @staticmethod
-    def productExceptSelf(nums: List[int]) -> List[int]:
-        """
-        An approach using prefix and suffix multiplication: Create two extra space,
-        i.e. two extra arrays to store the product of all the array elements from start,
-         up to that index and another array to store the product of all the array elements
-         from the end of the array to that index.
-        To get the product excluding that index, multiply the prefix product up to index i-1 with
-         the suffix product up to index i+1.
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        pr = 1
+        nulls = 0
+        for n in nums:
+            if n == 0:
+                nulls += 1
+            else:
+                pr *= n
 
-        from here: https://www.geeksforgeeks.org/a-product-array-puzzle/
-        """
-        length = len(nums)
-        prefix = [0] * length
-        suffix = [0] * length
+        if nulls > 1:
+            return [0] * len(nums)
 
-        for i, num in enumerate(nums):
-            j = length - i - 1
-            if i == 0:
-                prefix[i] = 1
-                suffix[j] = 1
-                continue
+        res = []
+        for n in nums:
+            if n == 0:
+                v = pr
+            elif nulls == 1:
+                v = 0
+            else:
+                v = pr // n
+            res.append(v)
 
-            # For every index i update prefix[i] as prefix[i] = prefix[i-1] * array[i-1],
-            # i.e store the product upto i-1 index from the start of array.
-            prefix[i] = prefix[i - 1] * nums[i - 1]
-
-            suffix[j] = suffix[j + 1] * nums[j + 1]
-
-        return [prefix[i] * suffix[i] for i in range(length)]
+        return res
 
 
 if __name__ == "__main__":
-    for in_, out in (
-        ([1, 2, 3], [6, 3, 2]),
-        ([3, 2, 1], [2, 3, 6]),
-    ):
-        assert Solution.productExceptSelf(in_) == out, f"expected {out=} for {in_=}"
+    assert Solution().productExceptSelf([1, 2, 3, 4]) == [24, 12, 8, 6]
+    assert Solution().productExceptSelf([-1, 1, 0, -3, 3]) == [0, 0, 9, 0, 0]
