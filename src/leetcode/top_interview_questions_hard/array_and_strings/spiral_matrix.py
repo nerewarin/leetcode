@@ -26,7 +26,6 @@ DIRECTIONS_CYCLE = (Direction.right, Direction.bot, Direction.left, Direction.to
 
 
 class Solution:
-
     def _get(self, x, y):
         return self.matrix[y][x]
 
@@ -64,7 +63,7 @@ class Solution:
         return res
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     do = Solution().spiralOrder
 
     matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
@@ -79,6 +78,6 @@ if __name__ == '__main__':
         [23, 18, 20, 26, 25],
         [24, 22, 3, 4, 4],
         [15, 22, 2, 24, 29],
-        [18, 15, 23, 28, 28]
+        [18, 15, 23, 28, 28],
     ]
     res = do(matrix)

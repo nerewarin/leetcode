@@ -1,10 +1,10 @@
 from typing import List
+import unittest
 
 
 class Solution:
     def maxDistance(self, position: List[int], m: int) -> int:
         position.sort()
-        original_position = list(position)
 
         p = len(position)
 
@@ -12,10 +12,10 @@ class Solution:
             return 0
 
         def calc_distance(position):
-            res = float('inf')
+            res = float("inf")
             for previous, current in zip(position, position[1:]):
                 res = min(res, current - previous)
-            if res == float('inf'):
+            if res == float("inf"):
                 return 0
             return res
 
@@ -38,8 +38,6 @@ class Solution:
         return calc_distance(placed)
 
 
-
-import unittest
 class TestSolution(unittest.TestCase):
     def _test(self, position, m, expected):
         self.assertEqual(Solution().maxDistance(position, m), expected)
@@ -63,7 +61,7 @@ class TestSolution(unittest.TestCase):
         self._test(position, m, expected)
 
     def test_case_1(self):
-        position = [1,2,3,4,7]
+        position = [1, 2, 3, 4, 7]
         m = 3
         expected = 3
         self._test(position, m, expected)

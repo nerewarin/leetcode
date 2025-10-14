@@ -2,16 +2,14 @@
 https://leetcode.com/problems/palindromic-substrings/?envType=daily-question&envId=2024-06-29
 """
 
+import unittest
+
+
 class Solution:
     def countSubstrings(self, s: str) -> int:
         subs = []
         for i, letter in enumerate(s):
-            fringe = [
-                (
-                    i,
-                    letter
-                )
-            ]
+            fringe = [(i, letter)]
 
             while fringe:
                 idx, candidate = fringe.pop(0)
@@ -24,8 +22,6 @@ class Solution:
         return len(subs)
 
 
-
-import unittest
 class TestSolution(unittest.TestCase):
     def _test(self, s, expected):
         self.assertEqual(Solution().countSubstrings(s), expected)

@@ -3,15 +3,17 @@ https://leetcode.com/problems/all-ancestors-of-a-node-in-a-directed-acyclic-grap
 
 
 """
+
 from typing import List
+import unittest
 
 
 class Graph:
-    def __init__(self,  edges: List[List[int]]):
+    def __init__(self, edges: List[List[int]]):
         self.edges = edges
-        self._ancestors = {}
+        self._ancestors: dict[int, list[int]] = {}
 
-    def get_ancestors(self, i):
+    def get_ancestors(self, i: int):
         if i in self._ancestors:
             return self._ancestors[i]
 
@@ -52,21 +54,53 @@ class Solution:
         return res
 
 
-import unittest
 class TestSolution(unittest.TestCase):
     def _test(self, n, edgeList, expected):
         self.assertEqual(Solution().getAncestors(n, edgeList), expected)
 
     def test_case_00(self):
         n = 8
-        edgeList = [[0, 3], [0, 4], [1, 3], [2, 4], [2, 7], [3, 5], [3, 6], [3, 7], [4, 6]]
-        expected = [[], [], [], [0, 1], [0, 2], [0, 1, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3]]
+        edgeList = [
+            [0, 3],
+            [0, 4],
+            [1, 3],
+            [2, 4],
+            [2, 7],
+            [3, 5],
+            [3, 6],
+            [3, 7],
+            [4, 6],
+        ]
+        expected = [
+            [],
+            [],
+            [],
+            [0, 1],
+            [0, 2],
+            [0, 1, 3],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3],
+        ]
 
         self._test(n, edgeList, expected)
 
     def test_case_01(self):
         n = 6
-        edgeList = [[0,3],[5,0],[2,3],[4,3],[5,3],[1,3],[2,5],[0,1],[4,5],[4,2],[4,0],[2,1],[5,1]]
-        expected = [[2,4,5],[0,2,4,5],[4],[0,1,2,4,5],[],[2,4]]
+        edgeList = [
+            [0, 3],
+            [5, 0],
+            [2, 3],
+            [4, 3],
+            [5, 3],
+            [1, 3],
+            [2, 5],
+            [0, 1],
+            [4, 5],
+            [4, 2],
+            [4, 0],
+            [2, 1],
+            [5, 1],
+        ]
+        expected = [[2, 4, 5], [0, 2, 4, 5], [4], [0, 1, 2, 4, 5], [], [2, 4]]
 
         self._test(n, edgeList, expected)

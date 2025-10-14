@@ -27,6 +27,7 @@ def maxDistance(position, m):
 
     return best
 
+
 # Example 1
 position1 = [1, 2, 3, 4, 99]
 m1 = 3
