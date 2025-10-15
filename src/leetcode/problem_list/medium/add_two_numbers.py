@@ -11,15 +11,20 @@ You may assume the two numbers do not contain any leading zero, except the numbe
 
 import pytest
 from typing import Optional
-from pydantic import BaseModel, Field
 
 
-class SingleDigitModel(BaseModel):
-    value: int = Field(ge=0, le=9)  # 0 <= value <= 9
+class SingleDigit:
+    def __init__(self, value: int):
+        if not 0 <= value <= 9:
+            raise ValueError("value must be between 0 and 9")
+        self.value = value
 
 
-class OverflowModel(BaseModel):
-    value: int = Field(ge=0, le=1)  # 0 <= value <= 1
+class Overflow:
+    def __init__(self, value: int):
+        if not 0 <= value <= 1:
+            raise ValueError("value must be between 0 and 9")
+        self.value = value
 
 
 # Definition for singly-linked list.
@@ -58,16 +63,16 @@ class ListNode:
         return " -> ".join(map(str, self.as_list()))
 
     @staticmethod
-    def _add_digits(*values: int) -> tuple[SingleDigitModel, OverflowModel]:
+    def _add_digits(*values: int) -> tuple[SingleDigit, Overflow]:
         overflow, value = divmod(sum(values), 10)
-        return SingleDigitModel(value=value), OverflowModel(value=overflow)
+        return SingleDigit(value=value), Overflow(value=overflow)
 
     def __add__(self, other: "ListNode") -> "ListNode":
         left = self
         right = other
 
         prev, prev_overflow = self._handle_pair(
-            left, right, prev=None, prev_overflow=OverflowModel(value=0)
+            left, right, prev=None, prev_overflow=Overflow(value=0)
         )
         first_elm = prev
 
@@ -99,8 +104,8 @@ class ListNode:
         left: "ListNode",
         right: "ListNode",
         prev: Optional["ListNode"],
-        prev_overflow: OverflowModel,
-    ) -> tuple["ListNode", OverflowModel]:
+        prev_overflow: Overflow,
+    ) -> tuple["ListNode", Overflow]:
         res = cls()
         value, overflow = cls._add_digits(left.val, right.val, prev_overflow.value)
         res.val = value.value
