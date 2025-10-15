@@ -24,19 +24,21 @@ class OverflowModel(BaseModel):
 
 # Definition for singly-linked list.
 class ListNode:
-    def __init__(self, val=0, next=None) -> None:
+    def __init__(self, val: int = 0, next: Optional["ListNode"] = None) -> None:
         self.val = val
         self.next = next
 
     @classmethod
     def from_list(cls, lst: list[int]) -> "ListNode":
-        prev_node = ListNode()
+        prev_node = None
         for value in reversed(lst):
             node = cls()
             node.val = value
             node.next = prev_node
             prev_node = node
 
+        if prev_node is None:
+            prev_node = ListNode()
         return prev_node
 
     @classmethod
@@ -70,10 +72,16 @@ class ListNode:
         first_elm = prev
 
         while left.next is not None or right.next is not None:
-            if (left := left.next) is None:
+            left_next = left.next
+            if left_next is None:
                 left = ListNode()
-            if (right := right.next) is None:
+            else:
+                left = left_next
+            right_next = right.next
+            if right_next is None:
                 right = ListNode()
+            else:
+                right = right_next
 
             prev, prev_overflow = self._handle_pair(left, right, prev, prev_overflow)
 
@@ -85,15 +93,16 @@ class ListNode:
 
         return first_elm
 
+    @classmethod
     def _handle_pair(
-        self,
+        cls,
         left: "ListNode",
         right: "ListNode",
         prev: Optional["ListNode"],
         prev_overflow: OverflowModel,
     ) -> tuple["ListNode", OverflowModel]:
-        res = self.__class__()
-        value, overflow = self._add_digits(left.val, right.val, prev_overflow.value)
+        res = cls()
+        value, overflow = cls._add_digits(left.val, right.val, prev_overflow.value)
         res.val = value.value
         if prev is not None:
             prev.next = res
