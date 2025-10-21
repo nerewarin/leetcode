@@ -21,3 +21,23 @@ repos:
     hooks:
       - id: mypy
         args: [--ignore-missing-imports]
+
+  - repo: local
+    hooks:
+      # Auto-format staged files on pre-commit
+      - id: autoformat-snake-case
+        name: Autoformat Python filenames to snake_case
+        entry: python scripts/format_to_snake_case.py --staged
+        language: system
+        types: [python]
+        stages: [pre-commit]
+        pass_filenames: false
+
+      # Double-check that everything is correct before commit
+      - id: verify-snake-case
+        name: Verify all Python filenames are snake_case
+        entry: python scripts/format_to_snake_case.py --check
+        language: system
+        types: [python]
+        stages: [pre-commit]
+        pass_filenames: true
