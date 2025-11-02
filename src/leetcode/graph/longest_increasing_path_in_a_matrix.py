@@ -37,22 +37,31 @@ class Solution:
         for i, row in enumerate(matrix):
             for j, cell in enumerate(row):
                 # compute max_path for cell expanding all paths from it, update all neighbors subpaths too
-                visited = set()
+
+                # we can't just ignore visited, we can get there with longer path - store it
+                visited_with_path_len: dict = {}
                 cur_path_len = 1
                 queue = collections.deque([(i, j, cur_path_len)])
                 max_path_for_cell = 1
                 while queue:
                     x, y, cur_path_len = queue.popleft()
                     value = matrix[x][y]
-                    visited.add((x, y))
+                    visited_with_path_len[(x, y)] = cur_path_len
 
                     all_neighbors = list(self._get_neighbors(x, y, matrix_size))
-                    neighbors = [neighbor for neighbor in all_neighbors if neighbor not in visited]
+
+                    neighbors = []
+                    for neighbor in all_neighbors:
+                        if neighbor in visited_with_path_len:
+                            if visited_with_path_len[neighbor] >= cur_path_len:
+                                continue
+                        neighbors.append(neighbor)
+
                     max_path_by_neighbor = [cur_path_len] * len(neighbors)
                     for n, neighbor in enumerate(neighbors):
                         n_x, n_y = neighbor
-                        if (n_x, n_y) in visited:
-                            continue
+                        # if (n_x, n_y) in visited:
+                        #     continue
 
                         n_value = self._get_value_by_pos_tuple(neighbor, matrix)
 
@@ -117,6 +126,14 @@ def main(matrix: list[list[int]]) -> int:
         pytest.param(
             dict(matrix=[[1, 2]]),
             2,
+        ),
+        pytest.param(
+            dict(matrix=[[7, 6, 1, 1], [2, 7, 6, 0], [1, 3, 5, 1], [6, 6, 3, 2]]),
+            7,
+        ),
+        pytest.param(
+            dict(matrix=[[7, 6, 1, 1], [2, 7, 6, 0], [1, 3, 5, 1], [6, 6, 3, 2]]),
+            7,
         ),
     ],
 )
