@@ -1,7 +1,6 @@
 import dataclasses
-from enum import Enum
-from typing import List
 import logging
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ class Solution:
     def _get(self, x, y):
         return self.matrix[y][x]
 
-    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+    def spiralOrder(self, matrix: list[list[int]]) -> list[int]:
         self.matrix = matrix
 
         m = len(matrix)

@@ -17,6 +17,19 @@ pre-commit = "^4.0.1"
 ruff = "^0.14.0"
 mypy = "^1.18.2"
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "Q",
+    "UP",
+    "I",
+    "ASYNC",
+]
 
 [build-system]
 requires = ["poetry-core"]

@@ -35,9 +35,7 @@ class Overflow:
 
 
 class Solution:
-    def addTwoNumbers(
-        self, l1: Optional[ListNode], l2: Optional[ListNode]
-    ) -> Optional[ListNode]:
+    def addTwoNumbers(self, l1: ListNode | None, l2: ListNode | None) -> ListNode | None:
         if l1 is None:
             return l2
         if l2 is None:
@@ -65,9 +63,7 @@ class Solution:
         return res, overflow
 
     def _sum(cls, left: "ListNode", right: "ListNode") -> "ListNode":
-        prev, prev_overflow = cls._handle_pair(
-            left, right, prev=None, prev_overflow=Overflow(value=0)
-        )
+        prev, prev_overflow = cls._handle_pair(left, right, prev=None, prev_overflow=Overflow(value=0))
         first_elm = prev
 
         while left.next is not None or right.next is not None:

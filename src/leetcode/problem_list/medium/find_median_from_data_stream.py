@@ -3,7 +3,6 @@ https://leetcode.com/problems/find-median-from-data-stream/description/
 """
 
 import heapq
-from typing import Optional
 
 
 class MedianFinder:
@@ -18,7 +17,7 @@ class MedianFinder:
 
         self.last_processed = -1
 
-        self.last_median: Optional[float] = None
+        self.last_median: float | None = None
 
     def addNum(self, num: int) -> None:
         self.arr.append(num)

@@ -1,9 +1,8 @@
-from typing import List
 import unittest
 
 
 class Solution:
-    def maxDistance(self, position: List[int], m: int) -> int:
+    def maxDistance(self, position: list[int], m: int) -> int:
         position.sort()
 
         p = len(position)

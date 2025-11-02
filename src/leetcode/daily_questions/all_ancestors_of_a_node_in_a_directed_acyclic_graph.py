@@ -4,12 +4,11 @@ https://leetcode.com/problems/all-ancestors-of-a-node-in-a-directed-acyclic-grap
 
 """
 
-from typing import List
 import unittest
 
 
 class Graph:
-    def __init__(self, edges: List[List[int]]):
+    def __init__(self, edges: list[list[int]]):
         self.edges = edges
         self._ancestors: dict[int, list[int]] = {}
 
@@ -43,7 +42,7 @@ class Graph:
 
 
 class Solution:
-    def getAncestors(self, n: int, edges: List[List[int]]) -> List[List[int]]:
+    def getAncestors(self, n: int, edges: list[list[int]]) -> list[list[int]]:
         g = Graph(edges)
 
         res = []

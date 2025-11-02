@@ -29,11 +29,9 @@ nums[i] is either 0, 1, or 2.
 Follow up: Could you come up with a one-pass algorithm using only constant extra space?
 """
 
-from typing import List
-
 
 class Solution:
-    def sortColors(self, nums: List[int]) -> None:
+    def sortColors(self, nums: list[int]) -> None:
         """
         Do not return anything, modify nums in-place instead.
         """

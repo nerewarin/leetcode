@@ -7,7 +7,7 @@ from typing import Optional
 
 # # Definition for a Node.
 class Node:
-    def __init__(self, val: int = 0, neighbors: Optional[list["Node"]] = None):
+    def __init__(self, val: int = 0, neighbors: list["Node"] | None = None):
         self.val = val
         self.neighbors = neighbors if neighbors is not None else []
 
@@ -17,7 +17,7 @@ class Solution:
         if not node:
             return None
 
-        cloned: dict["Node", "Node"] = {}  # original node -> cloned node
+        cloned: dict[Node, Node] = {}  # original node -> cloned node
 
         def dfs(cur: "Node") -> "Node":
             if cur in cloned:

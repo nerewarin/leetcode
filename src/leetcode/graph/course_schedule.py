@@ -3,11 +3,10 @@ https://leetcode.com/problems/course-schedule/?envType=problem-list-v2&envId=gra
 
 """
 
-from typing import List
-
-import pytest
 import collections
 import enum
+
+import pytest
 
 
 class State(enum.IntEnum):
@@ -23,9 +22,7 @@ class CycleDetected(Exception):
 class Solution:
     @staticmethod
     def _is_cyclic(adj_list: collections.defaultdict[int, list]):
-        states: collections.defaultdict[int, State] = collections.defaultdict(
-            lambda: State.unvisited
-        )
+        states: collections.defaultdict[int, State] = collections.defaultdict(lambda: State.unvisited)
 
         def dfs(u):
             assert (not states[u]) == (states[u] == State.unvisited)
@@ -48,7 +45,7 @@ class Solution:
                 return True
         return False
 
-    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+    def canFinish(self, numCourses: int, prerequisites: list[list[int]]) -> bool:
         # need to search for cyclic reference
 
         # format adj lists
@@ -60,7 +57,7 @@ class Solution:
         return res
 
 
-def main(numCourses: int, prerequisites: List[List[int]]):
+def main(numCourses: int, prerequisites: list[list[int]]):
     return Solution().canFinish(numCourses, prerequisites)
 
 

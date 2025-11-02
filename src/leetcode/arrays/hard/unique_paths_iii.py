@@ -1,12 +1,11 @@
-from typing import List, Optional, Set
-import unittest
 import collections
+import unittest
 
 DEBUG = False
 
 
 class Solution:
-    def __init__(self, world=None, visited: Optional[Set[int]] = None):
+    def __init__(self, world=None, visited: set[int] | None = None):
         self.world = world
 
         self.visited = set([])
@@ -62,11 +61,11 @@ class Solution:
         self.world = world
         return True
 
-    def uniquePathsIII(self, grid: List[List[int]]) -> int:
+    def uniquePathsIII(self, grid: list[list[int]]) -> int:
         self.init_world(grid)
         return len(self._get_unique_path(grid))
 
-    def _get_unique_path(self, grid: List[List[int]], path=None, start=None) -> set:
+    def _get_unique_path(self, grid: list[list[int]], path=None, start=None) -> set:
         visited = self.visited
         start = start or self.start
         path = path or tuple()
@@ -74,7 +73,7 @@ class Solution:
         to_visit: collections.deque = collections.deque()
         to_visit.append(start)
 
-        unique_paths: Set[tuple] = set([])
+        unique_paths: set[tuple] = set([])
         while to_visit:
             node = to_visit.popleft()
             path += (node,)
@@ -95,9 +94,7 @@ class Solution:
                 if neighboor in visited:
                     continue
 
-                paths = self.__class__(self.world, visited)._get_unique_path(
-                    grid, path, neighboor
-                )
+                paths = self.__class__(self.world, visited)._get_unique_path(grid, path, neighboor)
                 unique_paths = unique_paths.union(paths)
 
         return unique_paths

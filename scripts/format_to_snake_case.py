@@ -4,11 +4,11 @@ Pre-commit compatible Python filename formatter.
 Located in scripts/format_to_snake_case.py
 """
 
+import argparse
 import os
 import re
-import argparse
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -73,7 +73,7 @@ def get_gitignore_patterns(root_dir):
     gitignore_path = Path(root_dir) / ".gitignore"
 
     if gitignore_path.exists():
-        with open(gitignore_path, "r") as f:
+        with open(gitignore_path) as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#"):
@@ -116,9 +116,7 @@ def check_snake_case_compliance(filenames):
 def git_rename(old_path, new_path):
     """Use git mv to properly track the rename."""
     try:
-        subprocess.run(
-            ["git", "mv", str(old_path), str(new_path)], check=True, capture_output=True
-        )
+        subprocess.run(["git", "mv", str(old_path), str(new_path)], check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError:
         return False
@@ -140,9 +138,7 @@ def format_python_files(root_dir, dry_run=False, verbose=False, staged_only=Fals
                 check=True,
             )
             staged_files = [f.strip() for f in result.stdout.split("\n") if f.strip()]
-            python_files = [
-                Path(f) for f in staged_files if f.endswith(".py") and Path(f).exists()
-            ]
+            python_files = [Path(f) for f in staged_files if f.endswith(".py") and Path(f).exists()]
         except subprocess.CalledProcessError:
             raise RuntimeError("Failed to get staged files from git")
     else:
@@ -154,9 +150,7 @@ def format_python_files(root_dir, dry_run=False, verbose=False, staged_only=Fals
 
     for file_path in python_files:
         # Skip hidden directories and __pycache__
-        if any(
-            part.startswith(".") or part == "__pycache__" for part in file_path.parts
-        ):
+        if any(part.startswith(".") or part == "__pycache__" for part in file_path.parts):
             continue
 
         # Skip gitignored files
@@ -211,9 +205,7 @@ def format_python_files(root_dir, dry_run=False, verbose=False, staged_only=Fals
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Convert Python filenames to snake_case"
-    )
+    parser = argparse.ArgumentParser(description="Convert Python filenames to snake_case")
     parser.add_argument(
         "root_dir",
         nargs="?",
@@ -231,9 +223,7 @@ def main():
         action="store_true",
         help="Check only mode - exit with code 1 if non-snake_case files found",
     )
-    parser.add_argument(
-        "--staged", action="store_true", help="Format only staged git files"
-    )
+    parser.add_argument("--staged", action="store_true", help="Format only staged git files")
 
     # Handle the case where pre-commit passes filenames
     args, unknown_args = parser.parse_known_args()
@@ -253,19 +243,14 @@ def main():
             # Check mode for pre-commit
             if filenames_to_check:
                 # Check only the specific files passed by pre-commit
-                is_compliant, violations = check_snake_case_compliance(
-                    filenames_to_check
-                )
+                is_compliant, violations = check_snake_case_compliance(filenames_to_check)
             else:
                 # Check all Python files in the repository
                 root_path = Path(args.root_dir)
                 python_files = [
                     p
                     for p in root_path.rglob("*.py")
-                    if not any(
-                        part.startswith(".") or part == "__pycache__"
-                        for part in p.parts
-                    )
+                    if not any(part.startswith(".") or part == "__pycache__" for part in p.parts)
                 ]
                 # Convert to strings for compatibility
                 python_files_str = [str(p) for p in python_files]
@@ -279,18 +264,14 @@ def main():
                 for original, expected in violations:
                     print(f"   {original} -> {expected}")
                 print(f"\nFound {len(violations)} files that need renaming.")
-                print(
-                    "Run: python scripts/format_to_snake_case.py to fix automatically."
-                )
+                print("Run: python scripts/format_to_snake_case.py to fix automatically.")
                 return 1
         else:
             # Auto-format mode
             print("Python Filename Formatter - Converting to snake_case")
             print("=" * 50)
 
-            changes, skipped = format_python_files(
-                args.root_dir, args.dry_run, args.verbose, args.staged
-            )
+            changes, skipped = format_python_files(args.root_dir, args.dry_run, args.verbose, args.staged)
 
             print("=" * 50)
             if args.dry_run:
@@ -310,9 +291,7 @@ def main():
                     for file_path, reason in skipped:
                         print(f"  {file_path} - {reason}")
                 if changes and args.staged:
-                    print(
-                        "\nNote: Files were renamed using 'git mv' and are staged for commit."
-                    )
+                    print("\nNote: Files were renamed using 'git mv' and are staged for commit.")
                 return 0
 
     except Exception as e:

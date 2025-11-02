@@ -2,11 +2,9 @@
 https://leetcode.com/problems/remove-one-element-to-make-the-array-strictly-increasing/
 """
 
-from typing import List
-
 
 class Solution:
-    def _canBeIncreasing(self, nums: List[int]) -> bool:
+    def _canBeIncreasing(self, nums: list[int]) -> bool:
         misses = 0
         for i, el in enumerate(nums[1:]):
             if misses > 1:
@@ -25,7 +23,7 @@ class Solution:
 
         return True
 
-    def canBeIncreasing(self, nums: List[int]) -> bool:
+    def canBeIncreasing(self, nums: list[int]) -> bool:
         if len(set(nums)) < len(nums) - 1:
             return False
 
@@ -168,7 +166,7 @@ if __name__ == "__main__":
                 963,
                 980,
                 981,
-            ]
+            ],
         )
         is True
     )

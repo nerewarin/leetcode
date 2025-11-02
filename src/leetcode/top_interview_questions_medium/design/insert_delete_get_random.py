@@ -13,7 +13,6 @@ You must implement the functions of the class such that each function works in a
 
 import random
 
-
 # class RandomizedSet:
 #   def __init__(self):
 #     """

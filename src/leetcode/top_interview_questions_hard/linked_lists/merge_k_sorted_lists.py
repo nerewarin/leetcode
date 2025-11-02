@@ -39,7 +39,6 @@ lists[i] is sorted in ascending order.
 The sum of lists[i].length will not exceed 104.
 """
 
-from typing import List, Optional
 from queue import PriorityQueue
 
 
@@ -57,7 +56,7 @@ class ListNode:
 
 
 class Solution:
-    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+    def mergeKLists(self, lists: list[ListNode | None]) -> ListNode | None:
         # q = PriorityQueue()
         #
         # for lst in lists:
@@ -94,6 +93,6 @@ if __name__ == "__main__":
             ListNode(1, ListNode(4, ListNode(5))),
             ListNode(1, ListNode(3, ListNode(4))),
             ListNode(2, ListNode(6)),
-        ]
+        ],
     )
     print(r)
