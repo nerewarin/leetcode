@@ -7,6 +7,13 @@ from typing import List
 
 import pytest
 import collections
+import enum
+
+
+class State(enum.IntEnum):
+    unvisited = 0
+    visiting = 1
+    explored = 2
 
 
 class CycleDetected(Exception):
@@ -16,17 +23,24 @@ class CycleDetected(Exception):
 class Solution:
     @staticmethod
     def _is_cyclic(adj_list: collections.defaultdict[int, list]):
-        visited = set()
+        states: collections.defaultdict[int, State] = collections.defaultdict(
+            lambda: State.unvisited
+        )
 
         def dfs(u):
-            if u not in visited:
-                visited.add(u)
-            else:
-                raise CycleDetected
+            assert (not states[u]) == (states[u] == State.unvisited)
+            if not states[u]:
+                states[u] = State.visiting
 
             for v in adj_list.get(u, []):
-                dfs(v)
+                if states[v] == State.unvisited:
+                    dfs(v)
+                if states[v] == State.visiting:
+                    raise CycleDetected(f"Visited cycle detected at node {v!r}!")
 
+            states[u] = State.explored
+
+        # for every node
         for u in adj_list:
             try:
                 dfs(u)
