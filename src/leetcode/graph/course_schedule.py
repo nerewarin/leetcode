@@ -21,7 +21,12 @@ class CycleDetected(Exception):
 
 class Solution:
     @staticmethod
-    def _is_cyclic(adj_list: collections.defaultdict[int, list]):
+    def _is_cyclic_dfs_with_colors(numCourses: int, prerequisites: list[list[int]]) -> bool:
+        # format adj lists
+        adj_list = collections.defaultdict(list)
+        for u, v in prerequisites:
+            adj_list[u].append(v)
+
         states: collections.defaultdict[int, State] = collections.defaultdict(lambda: State.unvisited)
 
         def dfs(u):
@@ -45,22 +50,63 @@ class Solution:
                 return True
         return False
 
-    def canFinish(self, numCourses: int, prerequisites: list[list[int]]) -> bool:
-        # need to search for cyclic reference
-
-        # format adj lists
+    def _is_cycle_kahn(self, numCourses: int, prerequisites: list[list[int]]):
         adj_list = collections.defaultdict(list)
         for u, v in prerequisites:
             adj_list[u].append(v)
 
-        res = not self._is_cyclic(adj_list)
+        # Build adjacency list adj[b] contains all a with edges b → a.
+        directed_adj_list = collections.defaultdict(list)
+        # Compute inDegree[a] = number of prerequisites (incoming edges) to a.
+        in_degree: dict[int, int] = {}
+        for u, _prerequisites in adj_list.items():
+            in_degree[u] = len(_prerequisites)
+            for v in _prerequisites:
+                directed_adj_list[v].append(u)
+
+        for u in range(numCourses):
+            if u not in in_degree:
+                in_degree[u] = 0
+        in_degree = dict(in_degree)
+
+        queue: collections.deque = collections.deque()
+        for u, prerequisites_counter in in_degree.items():
+            if prerequisites_counter == 0:
+                queue.append(u)
+
+        taken_count = 0
+        while queue:
+            u = queue.popleft()
+            taken_count += 1
+            for v in directed_adj_list[u]:
+                in_degree[v] -= 1
+                if in_degree[v] == 0:
+                    queue.append(v)
+
+        # if equals - no cycle
+        return taken_count != numCourses
+
+    def canFinish(
+        self,
+        numCourses: int,
+        prerequisites: list[list[int]],
+        alg: str = "Kahn’s Algorithm (BFS / in-degree)",
+    ) -> bool:
+        if alg == "Kahn’s Algorithm (BFS / in-degree)":
+            res = not self._is_cycle_kahn(numCourses, prerequisites)
+        elif alg == "DFS with colors (cycle detection)":
+            # need to search for cyclic reference
+            res = not self._is_cyclic_dfs_with_colors(numCourses, prerequisites)
+        else:
+            raise NotImplementedError(f"{alg} not implemented")
         return res
 
 
-def main(numCourses: int, prerequisites: list[list[int]]):
-    return Solution().canFinish(numCourses, prerequisites)
+def main(numCourses: int, prerequisites: list[list[int]], algorithm: str):
+    return Solution().canFinish(numCourses, prerequisites, algorithm)
 
 
+@pytest.mark.parametrize("algorithm", ("Kahn’s Algorithm (BFS / in-degree)", "DFS with colors (cycle detection)"))
 @pytest.mark.parametrize(
     "input,expected",
     [
@@ -98,5 +144,5 @@ def main(numCourses: int, prerequisites: list[list[int]]):
         ),
     ],
 )
-def test(input, expected):
-    assert main(**input) == expected
+def test(input, expected, algorithm):
+    assert main(**input, algorithm=algorithm) == expected
