@@ -29,13 +29,10 @@ class Solution:
             return 0
 
         rows = len(matrix)
-        if rows == 1:
-            return 1
-
         cols = len(matrix[0])
         matrix_size = rows, cols
 
-        max_path_by_cell = [[0 for _ in range(len(matrix))] for _ in range(len(matrix[0]))]
+        max_path_by_cell = [[0 for _ in range(cols)] for _ in range(rows)]
 
         for i, row in enumerate(matrix):
             for j, cell in enumerate(row):
@@ -68,7 +65,8 @@ class Solution:
                                 queue.append((n_x, n_y, cur_path_len + 1))
                                 max_path_by_neighbor[n] += 1
 
-                    max_path_for_cell = max(max_path_for_cell, max(max_path_by_neighbor))
+                    if max_path_by_neighbor:
+                        max_path_for_cell = max(max_path_for_cell, max(max_path_by_neighbor))
 
                 max_path_by_cell[i][j] = max_path_for_cell
 
@@ -115,6 +113,10 @@ def main(matrix: list[list[int]]) -> int:
             Output: 4
             Explanation: The longest increasing path is [3, 4, 5, 6]. Moving diagonally is not allowed.
             """,
+        ),
+        pytest.param(
+            dict(matrix=[[1, 2]]),
+            2,
         ),
     ],
 )
