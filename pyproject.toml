@@ -30,6 +30,7 @@ select = [
     "I",
     "ASYNC",
 ]
+ignore = ["E501"]  # don't warn on long lines in docstrings/comments
 
 [build-system]
 requires = ["poetry-core"]
