@@ -79,8 +79,8 @@ def main(numCourses: int, prerequisites: List[List[int]]):
             id="""Example 3: [[1,4],[2,4],[3,1],[3,2]]
 
             1  <- 4
-            ^     |
-            |     v
+            |     |
+            v     v
             3  <- 2
 
             """,
