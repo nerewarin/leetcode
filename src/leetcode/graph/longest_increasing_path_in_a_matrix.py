@@ -6,67 +6,27 @@ import pytest
 
 
 class Solution:
-    @staticmethod
-    def _get_neighbors(i, j, matrix_size):
-        for step in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            neighbor = i + step[0], j + step[1]
-            for axis in range(2):
-                if not 0 <= neighbor[axis] < matrix_size[axis]:
-                    break
-            else:
-                yield neighbor
-
-    @classmethod
-    def _get_value_by_pos_tuple(cls, pos_tuple, matrix):
-        return cls._get_by_tuple(pos_tuple, matrix)
-
-    @staticmethod
-    def _get_by_tuple(pos_tuple, list2d):
-        x, y = pos_tuple
-        return list2d[x][y]
-
-    def dfs(self, i, j, matrix, cache, matrix_size):
-        if (i, j) in cache:
-            return cache[(i, j)], cache
-
-        max_path = 1
-
-        value = matrix[i][j]
-
-        neighbors = list(self._get_neighbors(i, j, matrix_size))
-
-        for n, neighbor in enumerate(neighbors):
-            n_x, n_y = neighbor
-
-            n_value = self._get_value_by_pos_tuple(neighbor, matrix)
-
-            if n_value > value:
-                neighbor_path_len, cache = self.dfs(n_x, n_y, matrix, cache, matrix_size)
-                path_len = 1 + neighbor_path_len
-                max_path = max(max_path, path_len)
-
-        cache[(i, j)] = max_path
-
-        return max_path, cache
-
     def longestIncreasingPath(self, matrix: list[list[int]]) -> int:
         if not matrix:
             return 0
 
-        rows = len(matrix)
-        cols = len(matrix[0])
-        matrix_size = rows, cols
+        rows, cols = len(matrix), len(matrix[0])
+        memo: dict[int, int] = {}
 
-        max_path_cache: dict[int, int] = {}
-        max_path_len = 1
+        def dfs(i, j):
+            if (i, j) in memo:
+                return memo[(i, j)]
 
-        for i, row in enumerate(matrix):
-            for j, cell in enumerate(row):
-                path_len, max_path_cache = self.dfs(i, j, matrix, max_path_cache, matrix_size)
+            max_length = 1
+            for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                ni, nj = i + di, j + dj
+                if 0 <= ni < rows and 0 <= nj < cols and matrix[ni][nj] > matrix[i][j]:
+                    max_length = max(max_length, 1 + dfs(ni, nj))
 
-                max_path_len = max(max_path_len, path_len)
+            memo[(i, j)] = max_length
+            return max_length
 
-        return max_path_len
+        return max(dfs(i, j) for i in range(rows) for j in range(cols))
 
 
 def main(matrix: list[list[int]]) -> int:
