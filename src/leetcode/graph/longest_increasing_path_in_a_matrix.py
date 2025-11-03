@@ -4,12 +4,10 @@ https://leetcode.com/problems/longest-increasing-path-in-a-matrix/?envType=probl
 
 import pytest
 
-print_backup = print
-# print = lambda x: None
-
 
 class Solution:
-    def _get_neighbors(self, i, j, matrix_size):
+    @staticmethod
+    def _get_neighbors(i, j, matrix_size):
         for step in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             neighbor = i + step[0], j + step[1]
             for axis in range(2):
@@ -18,10 +16,12 @@ class Solution:
             else:
                 yield neighbor
 
-    def _get_value_by_pos_tuple(self, pos_tuple, matrix):
-        return self._get_by_tuple(pos_tuple, matrix)
+    @classmethod
+    def _get_value_by_pos_tuple(cls, pos_tuple, matrix):
+        return cls._get_by_tuple(pos_tuple, matrix)
 
-    def _get_by_tuple(self, pos_tuple, list2d):
+    @staticmethod
+    def _get_by_tuple(pos_tuple, list2d):
         x, y = pos_tuple
         return list2d[x][y]
 
@@ -62,14 +62,7 @@ class Solution:
 
         for i, row in enumerate(matrix):
             for j, cell in enumerate(row):
-                import time
-
-                start = time.time()
-                print(f"considering ({i}, {j}) = {cell}")
-
                 path_len, max_path_cache = self.dfs(i, j, matrix, max_path_cache, matrix_size)
-
-                print(f"done in {time.time() - start} seconds. res = {path_len}")
 
                 max_path_len = max(max_path_len, path_len)
 
@@ -187,4 +180,4 @@ if __name__ == "__main__":
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         ],
     )
-    print_backup(res)
+    print(res)
