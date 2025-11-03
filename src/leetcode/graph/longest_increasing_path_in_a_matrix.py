@@ -11,7 +11,7 @@ class Solution:
             return 0
 
         rows, cols = len(matrix), len(matrix[0])
-        memo: dict[int, int] = {}
+        memo: dict[tuple[int, int], int] = {}
 
         def dfs(i, j):
             if (i, j) in memo:
