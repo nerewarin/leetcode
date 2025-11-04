@@ -62,9 +62,11 @@ class Solution:
             _adj_list[u].append(v)
         adj_list: dict[str, list[str]] = {u: sorted(v) for u, v in _adj_list.items()}
 
-        # check if only 1 ticket between any 2 cities exists
-        for u, vs in adj_list.items():
-            assert len(set(vs)) == len(vs), f"many tickets from {u} detected: {[x for x in vs]}"
+        # TODO for inp4 it's no more true! now check it breaks smth...
+        # # check if only 1 ticket between any 2 cities exists
+        # for u, vs in adj_list.items():
+        #     if len(set(vs)) != len(vs):
+        #         raise ValueError(f"many tickets from {u} detected: {[x for x in vs]}")
 
         start = "JFK"
 
@@ -193,6 +195,23 @@ def main(tickets: list[list[str]], f) -> list[str]:
         pytest.param(
             dict(tickets=[["JFK", "KUL"], ["JFK", "NRT"], ["NRT", "JFK"]]),
             ["JFK", "NRT", "JFK", "KUL"],
+        ),
+        pytest.param(
+            dict(
+                tickets=[
+                    ["EZE", "AXA"],
+                    ["TIA", "ANU"],
+                    ["ANU", "JFK"],
+                    ["JFK", "ANU"],
+                    ["ANU", "EZE"],
+                    ["TIA", "ANU"],
+                    ["AXA", "TIA"],
+                    ["TIA", "JFK"],
+                    ["ANU", "TIA"],
+                    ["JFK", "TIA"],
+                ],
+            ),
+            ["JFK", "ANU", "EZE", "AXA", "TIA", "ANU", "JFK", "TIA", "ANU", "TIA", "JFK"],
         ),
     ],
 )
