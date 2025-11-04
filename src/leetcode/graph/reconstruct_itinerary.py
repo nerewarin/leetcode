@@ -36,19 +36,17 @@ class Solution:
                 if not left_tickets_except_another[src]:
                     left_tickets_except_another.pop(src)
 
-                another_is_reachable = reachable(another_candidate, left_tickets_except_another)
-                # is_reachable = another_is_reachable # TODO
-
+                # we want every another is reachable from the rest part of this graph (with src - another_candidate edge cutted)
+                another_is_reachable_not_from_src = reachable(another_candidate, left_tickets_except_another)
+                # but it's not always possible. another way is to get back to src at least and go to another from src.
+                # so now but branch another->src (if exists) and check src is still reachable from our cutted graph left
                 left_tickets_except_src_from_another = copy.deepcopy(updated_left_tickets)
-                if src in left_tickets_except_src_from_another[another_candidate]:
+                if src in left_tickets_except_src_from_another.get(another_candidate, []):
                     left_tickets_except_src_from_another[another_candidate].remove(src)
                     if not left_tickets_except_src_from_another[another_candidate]:
                         left_tickets_except_src_from_another.pop(another_candidate)
 
-                # src_is_reachable = reachable(src, updated_left_tickets)
-                #
-                # is_reachable = another_is_reachable or src_is_reachable
-                is_reachable = another_is_reachable or reachable(src, left_tickets_except_src_from_another)
+                is_reachable = another_is_reachable_not_from_src or reachable(src, left_tickets_except_src_from_another)
                 if is_reachable:
                     continue
                 else:
@@ -191,6 +189,10 @@ def main(tickets: list[list[str]], f) -> list[str]:
                 "NNN",
                 "ATL",
             ],
+        ),
+        pytest.param(
+            dict(tickets=[["JFK", "KUL"], ["JFK", "NRT"], ["NRT", "JFK"]]),
+            ["JFK", "NRT", "JFK", "KUL"],
         ),
     ],
 )
