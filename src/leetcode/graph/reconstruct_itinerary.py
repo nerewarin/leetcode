@@ -38,6 +38,9 @@ class Solution:
 
                 # we want every another is reachable from the rest part of this graph (with src - another_candidate edge cutted)
                 another_is_reachable_not_from_src = reachable(another_candidate, left_tickets_except_another)
+                if another_is_reachable_not_from_src:
+                    continue
+
                 # but it's not always possible. another way is to get back to src at least and go to another from src.
                 # so now but branch another->src (if exists) and check src is still reachable from our cutted graph left
                 left_tickets_except_src_from_another = copy.deepcopy(updated_left_tickets)
@@ -45,9 +48,7 @@ class Solution:
                     left_tickets_except_src_from_another[another_candidate].remove(src)
                     if not left_tickets_except_src_from_another[another_candidate]:
                         left_tickets_except_src_from_another.pop(another_candidate)
-
-                is_reachable = another_is_reachable_not_from_src or reachable(src, left_tickets_except_src_from_another)
-                if is_reachable:
+                if reachable(src, left_tickets_except_src_from_another):
                     continue
                 else:
                     break
@@ -55,7 +56,7 @@ class Solution:
                 final_candidates.append(candidate)
 
         # now we need to sort them to first pick those who have more destinations from it, then alphabetically
-        # # TODO its a good idea - result if faster but not its not alphabetically best :(
+        # # # TODO its a good idea - result if faster but not its not alphabetically best :(
         # sorted_candidates = sorted(final_candidates, key=lambda c: (-len(left_tickets.get(c, [])), c))
         # return sorted_candidates
         return final_candidates
@@ -98,9 +99,14 @@ class Solution:
                     if not updated_left_tickets[src]:
                         updated_left_tickets.pop(src)
 
+                    if f:
+                        print(f"{time.time() - s} seconds. considering {dst} from {itinerary}...", file=f)
                     new_itinerary = dfs(dst, updated_left_tickets, itinerary + [dst], level + 1)
                     if new_itinerary is not None:
+                        # if f: print(f"{time.time() - s} seconds. good: considered {dst} from {itinerary}...", file=f)
                         return new_itinerary
+                    # else:
+                    # if f: print(f"{time.time() - s} seconds. bad : considered {dst} from {itinerary}...", file=f)
 
             nonlocal probe
             if f:
@@ -119,7 +125,7 @@ class Solution:
         return final_itinerary
 
 
-def main(tickets: list[list[str]], f) -> list[str]:
+def main(tickets: list[list[str]], f=None) -> list[str]:
     return Solution().findItinerary(tickets, f)
 
 
@@ -675,3 +681,225 @@ def test(inp, expected, request):
     path = file_.parent / (file_.stem + f"-test-{test_id}.txt")
     with path.open("w") as f:
         assert main(**inp, f=f) == expected
+
+
+if __name__ == "__main__":
+    main(
+        tickets=[
+            ["AUA", "EZE"],
+            ["JFK", "AUA"],
+            ["EZE", "ANU"],
+            ["AXA", "JFK"],
+            ["AUA", "JFK"],
+            ["ADL", "TIA"],
+            ["AUA", "AXA"],
+            ["ADL", "AUA"],
+            ["AUA", "AXA"],
+            ["AXA", "TIA"],
+            ["EZE", "AXA"],
+            ["AXA", "AUA"],
+            ["ANU", "JFK"],
+            ["ADL", "EZE"],
+            ["ADL", "ANU"],
+            ["EZE", "ADL"],
+            ["AXA", "AUA"],
+            ["JFK", "EZE"],
+            ["AUA", "JFK"],
+            ["AUA", "JFK"],
+            ["AXA", "JFK"],
+            ["ADL", "EZE"],
+            ["AUA", "EZE"],
+            ["AUA", "JFK"],
+            ["AUA", "JFK"],
+            ["JFK", "AXA"],
+            ["TIA", "AXA"],
+            ["JFK", "ADL"],
+            ["ADL", "AXA"],
+            ["AXA", "AUA"],
+            ["AUA", "AXA"],
+            ["JFK", "AXA"],
+            ["TIA", "JFK"],
+            ["ANU", "AXA"],
+            ["JFK", "AXA"],
+            ["EZE", "AXA"],
+            ["AXA", "EZE"],
+            ["JFK", "ADL"],
+            ["EZE", "AXA"],
+            ["ANU", "AXA"],
+            ["AXA", "JFK"],
+            ["JFK", "AUA"],
+            ["AXA", "EZE"],
+            ["ADL", "AXA"],
+            ["AUA", "ADL"],
+            ["AUA", "ADL"],
+            ["AXA", "AUA"],
+            ["ADL", "ANU"],
+            ["ANU", "AUA"],
+            ["ADL", "ANU"],
+            ["JFK", "ADL"],
+            ["TIA", "AUA"],
+            ["EZE", "AXA"],
+            ["ANU", "TIA"],
+            ["AXA", "ADL"],
+            ["JFK", "ANU"],
+            ["ADL", "ANU"],
+            ["TIA", "AUA"],
+            ["ADL", "ANU"],
+            ["AUA", "EZE"],
+            ["JFK", "ANU"],
+            ["AUA", "ANU"],
+            ["ADL", "AUA"],
+            ["JFK", "ADL"],
+            ["TIA", "JFK"],
+            ["AXA", "ANU"],
+            ["AXA", "ANU"],
+            ["JFK", "AXA"],
+            ["AXA", "JFK"],
+            ["ANU", "AXA"],
+            ["ADL", "EZE"],
+            ["JFK", "ANU"],
+            ["JFK", "AUA"],
+            ["AXA", "ANU"],
+            ["JFK", "TIA"],
+            ["ANU", "AXA"],
+            ["JFK", "AUA"],
+            ["AXA", "AUA"],
+            ["ADL", "EZE"],
+            ["ADL", "AXA"],
+            ["JFK", "TIA"],
+            ["EZE", "AUA"],
+            ["AUA", "ADL"],
+            ["JFK", "ADL"],
+            ["EZE", "TIA"],
+            ["TIA", "AXA"],
+            ["AUA", "ADL"],
+            ["JFK", "AUA"],
+            ["JFK", "AUA"],
+            ["AUA", "ANU"],
+            ["JFK", "ADL"],
+            ["AXA", "AUA"],
+            ["EZE", "JFK"],
+            ["ANU", "ADL"],
+            ["ADL", "EZE"],
+            ["ANU", "JFK"],
+            ["EZE", "ANU"],
+            ["AUA", "ANU"],
+            ["JFK", "EZE"],
+            ["EZE", "JFK"],
+            ["AXA", "AUA"],
+            ["ANU", "AUA"],
+            ["TIA", "JFK"],
+            ["ANU", "AXA"],
+            ["TIA", "ANU"],
+            ["AUA", "ADL"],
+            ["ANU", "AXA"],
+            ["AXA", "ADL"],
+            ["AUA", "AXA"],
+            ["ADL", "ANU"],
+            ["EZE", "AXA"],
+            ["EZE", "ANU"],
+            ["AXA", "EZE"],
+            ["AUA", "ADL"],
+            ["AUA", "ADL"],
+            ["TIA", "JFK"],
+            ["JFK", "AUA"],
+            ["ADL", "AUA"],
+            ["AXA", "TIA"],
+            ["AXA", "TIA"],
+            ["AXA", "ANU"],
+            ["AUA", "ADL"],
+            ["AUA", "AXA"],
+            ["ADL", "AUA"],
+            ["ANU", "TIA"],
+            ["AUA", "AXA"],
+            ["ANU", "TIA"],
+            ["AXA", "AUA"],
+            ["EZE", "JFK"],
+            ["ADL", "AUA"],
+            ["ADL", "EZE"],
+            ["AXA", "JFK"],
+            ["JFK", "TIA"],
+            ["AUA", "AXA"],
+            ["AUA", "AXA"],
+            ["JFK", "TIA"],
+            ["EZE", "ADL"],
+            ["AUA", "ADL"],
+            ["ANU", "AXA"],
+            ["EZE", "ADL"],
+            ["ADL", "ANU"],
+            ["TIA", "EZE"],
+            ["ANU", "AUA"],
+            ["AUA", "HBA"],
+            ["JFK", "AUA"],
+            ["TIA", "AUA"],
+            ["TIA", "ADL"],
+            ["AXA", "ADL"],
+            ["EZE", "AUA"],
+            ["EZE", "JFK"],
+            ["ANU", "TIA"],
+            ["ANU", "JFK"],
+            ["EZE", "AUA"],
+            ["EZE", "AUA"],
+            ["ADL", "JFK"],
+            ["ADL", "AUA"],
+            ["ADL", "AXA"],
+            ["AXA", "JFK"],
+            ["AXA", "AUA"],
+            ["ANU", "AUA"],
+            ["ANU", "JFK"],
+            ["TIA", "EZE"],
+            ["ANU", "AUA"],
+            ["ADL", "JFK"],
+            ["JFK", "ANU"],
+            ["ADL", "JFK"],
+            ["ANU", "AUA"],
+            ["JFK", "ADL"],
+            ["AXA", "ANU"],
+            ["AXA", "JFK"],
+            ["JFK", "ADL"],
+            ["EZE", "JFK"],
+            ["TIA", "AUA"],
+            ["ANU", "ADL"],
+            ["AUA", "AXA"],
+            ["ADL", "AXA"],
+            ["AUA", "JFK"],
+            ["ADL", "AXA"],
+            ["EZE", "ANU"],
+            ["TIA", "EZE"],
+            ["EZE", "JFK"],
+            ["ADL", "EZE"],
+            ["ANU", "JFK"],
+            ["AUA", "JFK"],
+            ["ANU", "JFK"],
+            ["EZE", "ADL"],
+            ["AUA", "ADL"],
+            ["EZE", "ANU"],
+            ["AXA", "EZE"],
+            ["AXA", "ADL"],
+            ["JFK", "TIA"],
+            ["AUA", "ADL"],
+            ["EZE", "TIA"],
+            ["AXA", "EZE"],
+            ["EZE", "AUA"],
+            ["JFK", "TIA"],
+            ["AUA", "AXA"],
+            ["TIA", "ANU"],
+            ["AXA", "JFK"],
+            ["TIA", "EZE"],
+            ["EZE", "ANU"],
+            ["ANU", "EZE"],
+            ["JFK", "TIA"],
+            ["JFK", "EZE"],
+            ["TIA", "AXA"],
+            ["ANU", "EZE"],
+            ["AUA", "TIA"],
+            ["AXA", "EZE"],
+            ["ANU", "AUA"],
+            ["AUA", "EZE"],
+            ["AUA", "EZE"],
+            ["ADL", "ANU"],
+            ["AUA", "AXA"],
+            ["AXA", "ADL"],
+            ["JFK", "EZE"],
+        ],
+    )
