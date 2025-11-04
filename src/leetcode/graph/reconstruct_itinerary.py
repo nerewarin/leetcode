@@ -9,7 +9,56 @@ import pytest
 
 
 class Solution:
-    def findItinerary(self, tickets: list[list[str]]) -> list[str]:
+    @staticmethod
+    def _get_possible_dst(src, left_tickets, itinerary_for_debug):
+        def reachable(c, updated_left_tickets):
+            for destinations in updated_left_tickets.values():
+                if c in destinations:
+                    return True
+            return False
+
+        candidates = left_tickets[src]
+        final_candidates = []
+        for candidate in candidates:
+            # if itinerary_for_debug == ["JFK", "SFO", "JFK", "ATL"] and candidate == "AAA":
+            #     debug = True  # debug case inp2 (starting from 0)
+            updated_left_tickets = copy.deepcopy(left_tickets)
+            updated_left_tickets[src].remove(candidate)
+            if not updated_left_tickets[src]:
+                updated_left_tickets.pop(src)
+
+            # check that any left candidate is reachable
+            other_candidates = [c for c in candidates if c != candidate]
+
+            for another_candidate in other_candidates:
+                left_tickets_except_another = copy.deepcopy(updated_left_tickets)
+                left_tickets_except_another[src].remove(another_candidate)
+                if not left_tickets_except_another[src]:
+                    left_tickets_except_another.pop(src)
+
+                another_is_reachable = reachable(another_candidate, left_tickets_except_another)
+                # is_reachable = another_is_reachable # TODO
+
+                left_tickets_except_src_from_another = copy.deepcopy(updated_left_tickets)
+                if src in left_tickets_except_src_from_another[another_candidate]:
+                    left_tickets_except_src_from_another[another_candidate].remove(src)
+                    if not left_tickets_except_src_from_another[another_candidate]:
+                        left_tickets_except_src_from_another.pop(another_candidate)
+
+                # src_is_reachable = reachable(src, updated_left_tickets)
+                #
+                # is_reachable = another_is_reachable or src_is_reachable
+                is_reachable = another_is_reachable or reachable(src, left_tickets_except_src_from_another)
+                if is_reachable:
+                    continue
+                else:
+                    break
+            else:
+                final_candidates.append(candidate)
+
+        return final_candidates
+
+    def findItinerary(self, tickets: list[list[str]], f=None) -> list[str]:
         _adj_list: collections.defaultdict[str, list[str]] = collections.defaultdict(list)
         for u, v in tickets:
             _adj_list[u].append(v)
@@ -23,16 +72,16 @@ class Solution:
 
         start_itinerary = [start]
         probe = 0
-        with open("./test.txt", "w") as f:
 
-            def dfs(src, left_tickets, itinerary, level):
-                if not left_tickets:
-                    return itinerary
+        def dfs(src, left_tickets, itinerary, level):
+            if not left_tickets:
+                return itinerary
 
-                if not left_tickets.get(src):
-                    return None
+            if not left_tickets.get(src):
+                return None
 
-                possible_dst = left_tickets[src]
+            if left_tickets[src]:
+                possible_dst = list(self._get_possible_dst(src, left_tickets, itinerary))
 
                 for dst in possible_dst:
                     updated_left_tickets = copy.deepcopy(left_tickets)
@@ -44,17 +93,21 @@ class Solution:
                     if new_itinerary is not None:
                         return new_itinerary
 
-                nonlocal probe
+            nonlocal probe
+            if f:
                 print(f"{probe}. lvl={level}. left={len(left_tickets)} for {itinerary} len of {len(itinerary)}", file=f)
-                probe += 1
-                return None
+            probe += 1
+            return None
 
-            final_itinerary = dfs(start, adj_list, start_itinerary, level=0)
-            return final_itinerary
+        final_itinerary = dfs(start, adj_list, start_itinerary, level=0)
+        if f:
+            print(f"{probe}. success: {final_itinerary}", file=f)
+
+        return final_itinerary
 
 
-def main(tickets: list[list[str]]) -> list[str]:
-    return Solution().findItinerary(tickets)
+def main(tickets: list[list[str]], f) -> list[str]:
+    return Solution().findItinerary(tickets, f)
 
 
 @pytest.mark.parametrize(
@@ -141,5 +194,11 @@ def main(tickets: list[list[str]]) -> list[str]:
         ),
     ],
 )
-def test(inp, expected):
-    assert main(**inp) == expected
+def test(inp, expected, request):
+    test_id = request.node.callspec.id
+    import pathlib
+
+    file_ = pathlib.Path(__file__)
+    path = file_.parent / (file_.stem + f"-test-{test_id}.txt")
+    with path.open("w") as f:
+        assert main(**inp, f=f) == expected
