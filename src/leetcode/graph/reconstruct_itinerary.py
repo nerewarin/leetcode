@@ -54,6 +54,10 @@ class Solution:
             else:
                 final_candidates.append(candidate)
 
+        # now we need to sort them to first pick those who have more destinations from it, then alphabetically
+        # # TODO its a good idea - result if faster but not its not alphabetically best :(
+        # sorted_candidates = sorted(final_candidates, key=lambda c: (-len(left_tickets.get(c, [])), c))
+        # return sorted_candidates
         return final_candidates
 
     def findItinerary(self, tickets: list[list[str]], f=None) -> list[str]:
@@ -100,13 +104,18 @@ class Solution:
 
             nonlocal probe
             if f:
-                print(f"{probe}. lvl={level}. left={len(left_tickets)} for {itinerary} len of {len(itinerary)}", file=f)
+                print(
+                    f"{time.time() - s} seconds. {probe=}. lvl={level}. "
+                    f"left={sum([len(v) for v in left_tickets.values()])}: {left_tickets} for\n"
+                    f"{itinerary} len of {len(itinerary)}",
+                    file=f,
+                )
             probe += 1
             return None
 
         final_itinerary = dfs(start, adj_list, start_itinerary, level=0)
         if f:
-            print(f"{probe}. success: {final_itinerary} in {time.time() - s} seconds.", file=f)
+            print(f"{time.time() - s} seconds. {probe=}. success:\n{final_itinerary}", file=f)
         return final_itinerary
 
 
