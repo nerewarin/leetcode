@@ -10,15 +10,6 @@ import pytest
 
 class Solution:
     def findItinerary(self, tickets: list[list[str]], *_) -> list[str]:
-        start = "JFK"
-
-        _adj_list: collections.defaultdict[str, list[str]] = collections.defaultdict(list)
-        for u, v in tickets:
-            _adj_list[u].append(v)
-
-        adj_list: dict[str, list[str]] = {u: sorted(v) for u, v in _adj_list.items()}
-        start_itinerary = [start]
-
         def dfs(src, itinerary, tail, left_tickets):
             if not left_tickets:
                 return itinerary, tail, True
@@ -57,12 +48,18 @@ class Solution:
 
             return itinerary, tail, False
 
-        start_tail: collections.deque[str] = collections.deque()
+        start = "JFK"  # by definition
+
+        _adj_list: collections.defaultdict[str, list[str]] = collections.defaultdict(list)
+        for u, v in tickets:
+            _adj_list[u].append(v)
+        adj_list: dict[str, list[str]] = {u: sorted(v) for u, v in _adj_list.items()}
+
         final_itinerary, final_tail, is_success = dfs(
-            start,
-            start_itinerary,
-            start_tail,
-            adj_list,
+            src=start,
+            itinerary=[start],
+            tail=collections.deque(),
+            left_tickets=adj_list,
         )
         return final_itinerary
 
