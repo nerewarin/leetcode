@@ -34,7 +34,6 @@ class Solution:
         initial_out_degree: dict[str, int] = dict(_initial_out_degree)
 
         # this is Eulerian Path/Circuit
-        end = None
         for node in all_nodes:
             in_ = initial_in_degree.get(node, 0)
             out_ = initial_out_degree.get(node, 0)
@@ -51,7 +50,7 @@ class Solution:
         start_itinerary = [start]
         probe = 0
 
-        def dfs(src, itinerary, tail, left_tickets, in_degree, out_degree, level):
+        def dfs(src, itinerary, tail, left_tickets, level):
             nonlocal tickets  # for debug
             if not left_tickets:
                 return itinerary, tail, True
@@ -70,12 +69,6 @@ class Solution:
                 left_tickets[src].remove(dst)
                 if not left_tickets[src]:
                     left_tickets.pop(src)
-                in_degree[dst] -= 1
-                if not in_degree[dst]:
-                    in_degree.pop(dst)
-                out_degree[src] -= 1
-                if not out_degree[src]:
-                    out_degree.pop(src)
 
                 if f:
                     print(f"{time.time() - s} seconds. considering {dst} from {src}...", file=f)
@@ -84,8 +77,6 @@ class Solution:
                     itinerary + [dst],
                     tail,
                     left_tickets,
-                    in_degree,
-                    out_degree,
                     level + 1,
                 )
                 new_itinerary_from_initial = new_itinerary[len(itinerary) :]
@@ -110,8 +101,6 @@ class Solution:
             start_itinerary,
             start_tail,
             adj_list,
-            initial_in_degree,
-            initial_out_degree,
             level=0,
         )
         if f:
