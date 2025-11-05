@@ -60,7 +60,8 @@ class Solution:
                 return itinerary, tail, False
 
             possible_dst = list(left_tickets[src])
-            # already sorted alphabetically, dont guarantee success
+            # already sorted alphabetically, don't guarantee success.
+            # if fails, reverts itinerary to recover point and updates tail
             for dst in possible_dst:
                 if src not in left_tickets:
                     # means already explored at deeper level
@@ -88,12 +89,11 @@ class Solution:
                     level + 1,
                 )
                 new_itinerary_from_initial = new_itinerary[len(itinerary) :]
-                # TODO handle new tail
 
                 if new_is_success:
+                    # handle tail
                     if f:
                         print(f"{time.time() - s} seconds. good: considered {dst} from {itinerary}...", file=f)
-
                     reversed_tail = []
                     while tail:
                         reversed_tail.append(tail.pop())
@@ -101,18 +101,7 @@ class Solution:
                 else:
                     for el in new_itinerary_from_initial:
                         tail.append(el)
-                    # tail += new_itinerary_from_initial
-                # if f: print(f"{time.time() - s} seconds. bad : considered {dst} from {itinerary}...", file=f)
 
-            nonlocal probe
-            # if f:
-            #     print(
-            #         f"{time.time() - s} seconds. {probe=}. lvl={level}. "
-            #         f"left={sum([len(v) for v in left_tickets.values()])}: {left_tickets} for\n"
-            #         f"{itinerary} len of {len(itinerary)}",
-            #         file=f,
-            #     )
-            probe += 1  # TODO join ?
             return itinerary, tail, False
 
         start_tail: collections.deque[str] = collections.deque()
