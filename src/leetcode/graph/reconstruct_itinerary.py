@@ -3,100 +3,37 @@ https://leetcode.com/problems/reconstruct-itinerary/description/?envType=problem
 """
 
 import collections
-import copy
+import pathlib
+import time
 
 import pytest
 
 
 class Solution:
-    @staticmethod
-    def _get_possible_dst(src, left_tickets, in_degree, itinerary_for_debug, end):
-        def reachable(c, updated_left_tickets):
-            for destinations in updated_left_tickets.values():
-                if c in destinations:
-                    return True
-            return False
-
-        candidates = left_tickets[src]
-        # if len(candidates) == 1:
-        #     return candidates
-        # elif end:
-        #     # if len(left_tickets) == 1 and list(list(left_tickets.values())[0]) == 1:
-        #     #     assert len(candidates) == 1
-        #     #     return [end]
-        #     # else:
-        #     #     candidates = [c for c in candidates if c != end]
-        #     candidates = [c for c in candidates if c != end]
-
-        final_candidates = []
-        for candidate in candidates:
-            # if itinerary_for_debug == ["JFK", "SFO", "JFK", "ATL"] and candidate == "AAA":
-            #     debug = True  # debug case inp2 (starting from 0)
-            updated_left_tickets = copy.deepcopy(left_tickets)
-            updated_left_tickets[src].remove(candidate)
-            if not updated_left_tickets[src]:
-                updated_left_tickets.pop(src)
-            # updated_in_degree = copy.copy(in_degree)
-            # updated_in_degree[candidate] -= 1
-
-            # check that any left candidate is reachable
-            other_candidates = set([c for c in candidates if c != candidate])
-
-            for another_candidate in other_candidates:
-                # another_is_reachable_not_from_src = updated_in_degree[another_candidate] > 0
-                left_tickets_except_another = copy.deepcopy(updated_left_tickets)
-                left_tickets_except_another[src].remove(another_candidate)
-                if not left_tickets_except_another[src]:
-                    left_tickets_except_another.pop(src)
-
-                # we want every another is reachable from the rest part of this graph (with src - another_candidate edge cutted)
-                another_is_reachable_not_from_src = reachable(another_candidate, left_tickets_except_another)
-                if another_is_reachable_not_from_src:
-                    continue
-
-                # but it's not always possible. another way is to get back to src at least and go to another from src.
-                # so now but branch another->src (if exists) and check src is still reachable from our cutted graph left
-                left_tickets_except_src_from_another = copy.deepcopy(updated_left_tickets)
-                if src in left_tickets_except_src_from_another.get(another_candidate, []):
-                    left_tickets_except_src_from_another[another_candidate].remove(src)
-                    if not left_tickets_except_src_from_another[another_candidate]:
-                        left_tickets_except_src_from_another.pop(another_candidate)
-                if reachable(src, left_tickets_except_src_from_another):
-                    continue
-                else:
-                    break
-            else:
-                final_candidates.append(candidate)
-
-        # now we need to sort them to first pick those who have more destinations from it, then alphabetically
-        # # # TODO its a good idea - result if faster but not its not alphabetically best :(
-        # sorted_candidates = sorted(final_candidates, key=lambda c: (-len(left_tickets.get(c, [])), c))
-        # return sorted_candidates
-        return final_candidates
-
     def findItinerary(self, tickets: list[list[str]], f=None) -> list[str]:
+        start = "JFK"
+
         if f:
             # debug mode
-            import time
-
             s = time.time()
+
         _adj_list: collections.defaultdict[str, list[str]] = collections.defaultdict(list)
+        # Compute inDegree[a] = number of src for any dst (incoming edges) to a.
+        _initial_in_degree: collections.defaultdict[str, int] = collections.defaultdict(int)
+        all_nodes = set()
+        _initial_out_degree: collections.defaultdict[str, int] = collections.defaultdict(int)
         for u, v in tickets:
             _adj_list[u].append(v)
-        adj_list: dict[str, list[str]] = {u: sorted(v) for u, v in _adj_list.items()}
-
-        initial_out_degree: dict[str, int] = {u: len(v) for u, v in adj_list.items()}
-        # Compute inDegree[a] = number of src for any dst (incoming edges) to a.
-        initial_in_degree: dict[str, int] = collections.defaultdict(int)
-        for src, destinations in adj_list.items():
-            for dst in destinations:
-                initial_in_degree[dst] += 1
-
-        all_nodes = set()
-        for u, v in tickets:
             all_nodes.add(u)
             all_nodes.add(v)
+            _initial_in_degree[v] += 1
+            _initial_out_degree[u] += 1
 
+        adj_list: dict[str, list[str]] = {u: sorted(v) for u, v in _adj_list.items()}
+        initial_in_degree: dict[str, int] = dict(_initial_in_degree)
+        initial_out_degree: dict[str, int] = dict(_initial_out_degree)
+
+        # this is Eulerian Path/Circuit
         end = None
         for node in all_nodes:
             in_ = initial_in_degree.get(node, 0)
@@ -105,64 +42,100 @@ class Solution:
                 assert in_ - out_ == 1
                 end = node
                 if f:
-                    print(f"End detected: {end}", file=f)
+                    print(f"Eulerian Path detected: {end=}", file=f)
                 break
-
-        # TODO for inp4 it's no more true! now check it breaks smth...
-        # # check if only 1 ticket between any 2 cities exists
-        # for u, vs in adj_list.items():
-        #     if len(set(vs)) != len(vs):
-        #         raise ValueError(f"many tickets from {u} detected: {[x for x in vs]}")
-
-        start = "JFK"
+        else:
+            print(f"Eulerian Circuit detected: end=start={start}", file=f)
+            end = start
 
         start_itinerary = [start]
         probe = 0
 
-        def dfs(src, left_tickets, in_degree, itinerary, level):
+        def dfs(src, itinerary, tail, left_tickets, in_degree, out_degree, level):
+            nonlocal tickets  # for debug
             if not left_tickets:
-                return itinerary
+                return itinerary, tail, True
 
             if not left_tickets.get(src):
-                return None
+                return itinerary, tail, False
 
-            if left_tickets[src]:
-                nonlocal end
-                possible_dst = list(self._get_possible_dst(src, left_tickets, in_degree, itinerary, end))
-                # possible_dst = left_tickets[src]
+            possible_dst = list(left_tickets[src])
+            # already sorted alphabetically, dont guarantee success
+            for dst in possible_dst:
+                if src not in left_tickets:
+                    # means already explored at deeper level
+                    continue
+                # cut edge
+                left_tickets[src].remove(dst)
+                if not left_tickets[src]:
+                    left_tickets.pop(src)
+                in_degree[dst] -= 1
+                if not in_degree[dst]:
+                    in_degree.pop(dst)
+                out_degree[src] -= 1
+                if not out_degree[src]:
+                    out_degree.pop(src)
 
-                for dst in possible_dst:
-                    updated_left_tickets = copy.deepcopy(left_tickets)
-                    updated_left_tickets[src].remove(dst)
-                    if not updated_left_tickets[src]:
-                        updated_left_tickets.pop(src)
-                    # updated_in_degree = copy.copy(in_degree)
-                    # updated_in_degree[dst] -= 1
-                    updated_in_degree = in_degree  # temp
+                if f:
+                    print(f"{time.time() - s} seconds. considering {dst} from {src}...", file=f)
+                new_itinerary, new_tail, new_is_success = dfs(
+                    dst,
+                    itinerary + [dst],
+                    tail,
+                    left_tickets,
+                    in_degree,
+                    out_degree,
+                    level + 1,
+                )
+                new_itinerary_from_initial = new_itinerary[len(itinerary) :]
+                # TODO handle new tail
 
+                if new_is_success:
                     if f:
-                        print(f"{time.time() - s} seconds. considering {dst} from {itinerary}...", file=f)
-                    new_itinerary = dfs(dst, updated_left_tickets, updated_in_degree, itinerary + [dst], level + 1)
-                    if new_itinerary is not None:
-                        # if f: print(f"{time.time() - s} seconds. good: considered {dst} from {itinerary}...", file=f)
-                        return new_itinerary
-                    # else:
-                    # if f: print(f"{time.time() - s} seconds. bad : considered {dst} from {itinerary}...", file=f)
+                        print(f"{time.time() - s} seconds. good: considered {dst} from {itinerary}...", file=f)
+
+                    reversed_tail = []
+                    while tail:
+                        reversed_tail.append(tail.pop())
+                    return new_itinerary + reversed_tail, tail, True
+                else:
+                    for el in new_itinerary_from_initial:
+                        tail.append(el)
+                    # tail += new_itinerary_from_initial
+                # if f: print(f"{time.time() - s} seconds. bad : considered {dst} from {itinerary}...", file=f)
 
             nonlocal probe
-            if f:
-                print(
-                    f"{time.time() - s} seconds. {probe=}. lvl={level}. "
-                    f"left={sum([len(v) for v in left_tickets.values()])}: {left_tickets} for\n"
-                    f"{itinerary} len of {len(itinerary)}",
-                    file=f,
-                )
-            probe += 1
-            return None
+            # if f:
+            #     print(
+            #         f"{time.time() - s} seconds. {probe=}. lvl={level}. "
+            #         f"left={sum([len(v) for v in left_tickets.values()])}: {left_tickets} for\n"
+            #         f"{itinerary} len of {len(itinerary)}",
+            #         file=f,
+            #     )
+            probe += 1  # TODO join ?
+            return itinerary, tail, False
 
-        final_itinerary = dfs(start, adj_list, initial_in_degree, start_itinerary, level=0)
+        start_tail: collections.deque[str] = collections.deque()
+        final_itinerary, final_tail, is_success = dfs(
+            start,
+            start_itinerary,
+            start_tail,
+            adj_list,
+            initial_in_degree,
+            initial_out_degree,
+            level=0,
+        )
         if f:
-            print(f"{time.time() - s} seconds. {probe=}. success:\n{final_itinerary}", file=f)
+            print(f"{time.time() - s} seconds. {probe=}. {is_success=}:\n{final_itinerary}", file=f)
+
+        if not is_success:
+            raise RuntimeError(f"{is_success=}")
+        if final_itinerary[-1] != end:
+            raise RuntimeError(f"{final_itinerary[-1]=} != {end=}")
+        if len(final_itinerary) != len(tickets) + 1:
+            raise RuntimeError(f"{len(final_itinerary)=} != {len(tickets) + 1=}")
+        if final_tail:
+            raise RuntimeError(f"Unhandled {final_tail=}")
         return final_itinerary
 
 
@@ -254,6 +227,23 @@ def main(tickets: list[list[str]], f=None) -> list[str]:
                 "ATL",
             ],
             # 2
+            #           AAA ←→
+            #           BBB ←→
+            #           CCC ←→
+            #           DDD ←→
+            #           EEE ←→
+            #           FFF ←→
+            #           GGG ←→
+            #           HHH ←→
+            #           III ←→
+            #           JJJ ←→
+            #           KKK ←→
+            #           LLL ←→
+            #           MMM ←→
+            #           NNN ←→
+            #              ↑
+            #              |
+            # SFO ←→ JFK → ATL
         ),
         pytest.param(
             dict(tickets=[["JFK", "KUL"], ["JFK", "NRT"], ["NRT", "JFK"]]),
@@ -2286,7 +2276,6 @@ def main(tickets: list[list[str]], f=None) -> list[str]:
 )
 def test(inp, expected, request):
     test_id = request.node.callspec.id
-    import pathlib
 
     file_ = pathlib.Path(__file__)
     path = file_.parent / (file_.stem + f"-test-{test_id}.txt")
