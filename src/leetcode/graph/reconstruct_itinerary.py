@@ -4,54 +4,22 @@ https://leetcode.com/problems/reconstruct-itinerary/description/?envType=problem
 
 import collections
 import pathlib
-import time
 
 import pytest
 
 
 class Solution:
-    def findItinerary(self, tickets: list[list[str]], f=None) -> list[str]:
+    def findItinerary(self, tickets: list[list[str]], *_) -> list[str]:
         start = "JFK"
 
-        if f:
-            # debug mode
-            s = time.time()
-
         _adj_list: collections.defaultdict[str, list[str]] = collections.defaultdict(list)
-        # Compute inDegree[a] = number of src for any dst (incoming edges) to a.
-        _initial_in_degree: collections.defaultdict[str, int] = collections.defaultdict(int)
-        all_nodes = set()
-        _initial_out_degree: collections.defaultdict[str, int] = collections.defaultdict(int)
         for u, v in tickets:
             _adj_list[u].append(v)
-            all_nodes.add(u)
-            all_nodes.add(v)
-            _initial_in_degree[v] += 1
-            _initial_out_degree[u] += 1
 
         adj_list: dict[str, list[str]] = {u: sorted(v) for u, v in _adj_list.items()}
-        initial_in_degree: dict[str, int] = dict(_initial_in_degree)
-        initial_out_degree: dict[str, int] = dict(_initial_out_degree)
-
-        # this is Eulerian Path/Circuit
-        for node in all_nodes:
-            in_ = initial_in_degree.get(node, 0)
-            out_ = initial_out_degree.get(node, 0)
-            if in_ > out_:
-                assert in_ - out_ == 1
-                end = node
-                if f:
-                    print(f"Eulerian Path detected: {end=}", file=f)
-                break
-        else:
-            print(f"Eulerian Circuit detected: end=start={start}", file=f)
-            end = start
-
         start_itinerary = [start]
-        probe = 0
 
-        def dfs(src, itinerary, tail, left_tickets, level):
-            nonlocal tickets  # for debug
+        def dfs(src, itinerary, tail, left_tickets):
             if not left_tickets:
                 return itinerary, tail, True
 
@@ -65,32 +33,26 @@ class Solution:
                 if src not in left_tickets:
                     # means already explored at deeper level
                     continue
+
                 # cut edge
                 left_tickets[src].remove(dst)
                 if not left_tickets[src]:
                     left_tickets.pop(src)
 
-                if f:
-                    print(f"{time.time() - s} seconds. considering {dst} from {src}...", file=f)
                 new_itinerary, new_tail, new_is_success = dfs(
                     dst,
                     itinerary + [dst],
                     tail,
                     left_tickets,
-                    level + 1,
                 )
-                new_itinerary_from_initial = new_itinerary[len(itinerary) :]
-
                 if new_is_success:
-                    # handle tail
-                    if f:
-                        print(f"{time.time() - s} seconds. good: considered {dst} from {itinerary}...", file=f)
-                    reversed_tail = []
+                    # add tail to the end of itinerary in reversed order (we pushed the dead end first -> extract last)
                     while tail:
-                        reversed_tail.append(tail.pop())
-                    return new_itinerary + reversed_tail, tail, True
+                        new_itinerary.append(tail.pop())
+                    return new_itinerary, tail, True
                 else:
-                    for el in new_itinerary_from_initial:
+                    dead_path = new_itinerary[len(itinerary) :]
+                    for el in dead_path:
                         tail.append(el)
 
             return itinerary, tail, False
@@ -101,19 +63,7 @@ class Solution:
             start_itinerary,
             start_tail,
             adj_list,
-            level=0,
         )
-        if f:
-            print(f"{time.time() - s} seconds. {probe=}. {is_success=}:\n{final_itinerary}", file=f)
-
-        if not is_success:
-            raise RuntimeError(f"{is_success=}")
-        if final_itinerary[-1] != end:
-            raise RuntimeError(f"{final_itinerary[-1]=} != {end=}")
-        if len(final_itinerary) != len(tickets) + 1:
-            raise RuntimeError(f"{len(final_itinerary)=} != {len(tickets) + 1=}")
-        if final_tail:
-            raise RuntimeError(f"Unhandled {final_tail=}")
         return final_itinerary
 
 
