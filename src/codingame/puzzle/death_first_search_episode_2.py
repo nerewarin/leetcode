@@ -3,6 +3,7 @@ https://www.codingame.com/ide/puzzle/death-first-search-episode-2
 """
 
 import collections
+import os
 import sys
 
 # Auto-generated code below aims at helping you parse
@@ -44,14 +45,40 @@ def calc_distances(si, adj_list):
     return min_distances
 
 
-def risk_factor(u, distances, nodes_connected_to_gates):
-    # computes risk of vertex u
-    ...
-    dist = distances[u]
-    gates_connected = len(nodes_connected_to_gates[u])
+def compute_risks(si, adj_list, nodes_connected_to_gates, gateways):
+    queue = collections.deque()
+    queue.append((si, 0, 0))
 
-    risk = gates_connected - dist
-    return risk
+    risks = dict()
+    risks_disconnected = dict()
+    visited_nodes_to_min_dist = {}  # with min distances
+    while queue:
+        u, distance, accumulated_gates_connected = queue.popleft()
+        if u in nodes_connected_to_gates:
+            gates_connected = len(nodes_connected_to_gates[u])
+        else:
+            gates_connected = 0
+
+        # new_risk = compute_risk_for_node(u, distance, nodes_connected_to_gates)
+        new_risk = gates_connected - distance + accumulated_gates_connected
+
+        accumulated_gates_connected += gates_connected
+
+        if gates_connected:
+            risks[u] = max(risks.get(u, float("-inf")), new_risk)
+        else:
+            risks_disconnected[u] = max(risks_disconnected.get(u, float("-inf")), new_risk)
+        visited_nodes_to_min_dist[u] = distance
+
+        for v in adj_list[u]:
+            dist = distance + 1
+            if v in gateways:
+                continue
+
+            if visited_nodes_to_min_dist.get(v, float("inf")) > dist:
+                queue.append((v, dist, accumulated_gates_connected))
+
+    return risks
 
 
 def main(si, adj_list, gateways):
@@ -63,14 +90,23 @@ def main(si, adj_list, gateways):
             if n not in gateways:
                 nodes_connected_to_gates[n].add(u)
 
+    risks = compute_risks(si, adj_list, nodes_connected_to_gates, gateways)
+
     node_to_block = None
     max_risk = float("-inf")
-    for node in nodes_connected_to_gates:
-        risk = risk_factor(node, distances, nodes_connected_to_gates)
+    min_dist = float("inf")
+    for node in sorted(list(nodes_connected_to_gates)):
+        risk = risks[node]
+        dist = distances[node]
         debug(f"risk_factor({node})={risk}")
         if risk > max_risk:
             max_risk = risk
             node_to_block = node
+            min_dist = dist
+        elif risk == max_risk:
+            if dist < min_dist:
+                node_to_block = node
+                min_dist = dist
 
     if not node_to_block:
         debug(f"{node_to_block=}")
@@ -93,35 +129,103 @@ def main(si, adj_list, gateways):
     return edge_to_cut
 
 
-DEBUG = False
+DEBUG = os.getenv("DEBUG")
 if DEBUG:
-    n = 8
-    l = 13  # noqa: E741
-    e = 2
-    # len(edges)=13
-    edges = [(6, 2), (7, 3), (6, 3), (5, 3), (3, 4), (7, 1), (2, 0), (0, 1), (0, 3), (1, 3), (2, 3), (7, 4), (6, 5)]
-    adj_list = {
-        6: [2, 3, 5],
-        2: [6, 0, 3],
-        7: [3, 1, 4],
-        3: [7, 6, 5, 4, 0, 1, 2],
-        5: [3, 6],
-        4: [3, 7],
-        1: [7, 0, 3],
-        0: [2, 1, 3],
-    }
-    degree = {6: 3, 2: 3, 7: 3, 3: 7, 5: 2, 4: 2, 1: 3, 0: 3}
-    gateways = [4, 5]
-    si = 0
+    ##################
+    # 01 Robust double gateways
+    ##################
+    # n = 8
+    # l = 13 # noqa: E741
+    # e = 2
+    # edges = [(6, 2), (7, 3), (6, 3), (5, 3), (3, 4), (7, 1), (2, 0), (0, 1), (0, 3), (1, 3), (2, 3), (7, 4), (6, 5)]
+    # adj_list = {6: [2, 3, 5], 2: [6, 0, 3], 7: [3, 1, 4], 3: [7, 6, 5, 4, 0, 1, 2], 5: [3, 6], 4: [3, 7], 1: [7, 0, 3],
+    #             0: [2, 1, 3]}
+    # points = (0, 3, 6, 3)
+    # gateways = [4, 5]
 
-    main(0, adj_list, gateways)
-    main(6, adj_list, gateways)
+    ##################
+    # 03  Leading up to a double gateway
+    ##################
+    n = 12
+    l = 20  # noqa: E741
+    e = 2
+    edges = [
+        (0, 9),
+        (6, 1),
+        (0, 6),
+        (0, 3),
+        (0, 2),
+        (11, 5),
+        (10, 11),
+        (11, 9),
+        (10, 9),
+        (8, 9),
+        (5, 9),
+        (4, 5),
+        (0, 4),
+        (0, 1),
+        (3, 4),
+        (8, 10),
+        (0, 5),
+        (1, 2),
+        (6, 7),
+        (2, 3),
+    ]
+    adj_list = {
+        0: [9, 6, 3, 2, 4, 1, 5],
+        9: [0, 11, 10, 8, 5],
+        6: [1, 0, 7],
+        1: [6, 0, 2],
+        3: [0, 4, 2],
+        2: [0, 1, 3],
+        11: [5, 10, 9],
+        5: [11, 9, 4, 0],
+        10: [11, 9, 8],
+        8: [9, 10],
+        4: [5, 0, 3],
+        7: [6],
+    }
+    gateways = [0, 7]
+    points = [8, 9]
+
+    ##################
+    # 05 Complex mesh
+    ##################
+    # n = 37
+    # l = 81 # noqa: E741
+    # e = 4
+    # edges = [
+    #     (2, 5), (14, 13), (16, 13), (19, 21), (13, 7), (16, 8), (35, 5), (2, 35), (10, 0), (8, 3), (23, 16),
+    #     (0, 1), (31, 17), (19, 22), (12, 11), (1, 2), (1, 4), (14, 9), (17, 16), (30, 29), (32, 22), (28, 26),
+    #     (24, 23), (20, 19), (15, 13), (18, 17), (6, 1), (29, 28), (15, 14), (9, 13), (32, 18), (25, 26), (1, 7),
+    #     (34, 35), (33, 34), (27, 16), (27, 26), (23, 25), (33, 3), (16, 30), (25, 24), (3, 2), (5, 4), (31, 32),
+    #     (27, 25), (19, 3), (17, 8), (4, 2), (32, 17), (10, 11), (29, 27), (30, 27), (6, 4), (24, 15), (9, 10),
+    #     (34, 2), (9, 7), (11, 6), (33, 2), (14, 10), (12, 6), (0, 6), (19, 17), (20, 3), (21, 20), (21, 32),
+    #     (15, 16), (0, 9), (23, 27), (11, 0), (28, 27), (22, 18), (3, 1), (23, 15), (18, 19), (7, 0), (19, 8),
+    #     (21, 22), (7, 36), (13, 36), (8, 36),
+    # ]
+    # adj_list = {
+    #     2: [5, 35, 1, 3, 4, 34, 33], 5: [2, 35, 4], 14: [13, 9, 15, 10], 13: [14, 16, 7, 15, 9, 36],
+    #     16: [13, 8, 23, 17, 27, 30, 15], 19: [21, 22, 20, 3, 17, 18, 8], 21: [19, 20, 32, 22],
+    #     7: [13, 1, 9, 0, 36], 8: [16, 3, 17, 19, 36], 35: [5, 2, 34], 10: [0, 11, 9, 14],
+    #     0: [10, 1, 6, 9, 11, 7], 3: [8, 33, 2, 19, 20, 1], 23: [16, 24, 25, 27, 15], 1: [0, 2, 4, 6, 7, 3],
+    #     31: [17, 32], 17: [31, 16, 18, 8, 32, 19], 22: [19, 32, 18, 21], 12: [11, 6], 11: [12, 10, 6, 0],
+    #     4: [1, 5, 2, 6], 9: [14, 13, 10, 7, 0], 30: [29, 16, 27], 29: [30, 28, 27], 32: [22, 18, 31, 17, 21],
+    #     28: [26, 29, 27], 26: [28, 25, 27], 24: [23, 25, 15], 20: [19, 3, 21], 15: [13, 14, 24, 16, 23],
+    #     18: [17, 32, 22, 19], 6: [1, 4, 11, 12, 0], 25: [26, 23, 24, 27], 34: [35, 33, 2], 33: [34, 3, 2],
+    #     27: [16, 26, 25, 29, 30, 23, 28], 36: [7, 13, 8],
+    # }
+    # gateways = [0, 16, 18, 26]
+    # si = 2
+
+    for point in points:
+        main(point, adj_list, gateways)
+
 else:
     n, l, e = [int(i) for i in input().split()]  # noqa: E741
 
     edges = []
     adj_list = collections.defaultdict(list)
-    degree = collections.defaultdict(int)
     for i in range(l):
         # n1: N1 and N2 defines a link between these nodes
         n1, n2 = [int(j) for j in input().split()]
@@ -129,21 +233,17 @@ else:
         edges.append((n1, n2))
         adj_list[n1].append(n2)
         adj_list[n2].append(n1)
-        degree[n1] += 1
-        degree[n2] += 1
 
     adj_list = dict(adj_list)
-    degree = dict(degree)
 
     # the index of a gateway node
     gateways = [int(input()) for i in range(e)]
 
     debug(f"{n=}")
-    debug(f"{l=}")
+    debug(f"{l=} # noqa: E741")
     debug(f"{e=}")
     debug(f"{edges=}")
     debug(f"{adj_list=}")
-    debug(f"{degree=}")
     debug(f"{gateways=}")
 
     # game loop
