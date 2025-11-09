@@ -43,11 +43,25 @@ def calc_distances(si, adj_list):
 
 
 def compute_risks(si, adj_list, nodes_connected_to_gates, gateways):
+    """
+    For every node connected to gate, compute how dangerous it is for agent to reach in current state aka
+        "risk" =  gates_connected  - distance (to agent) + accumulated_gates_connected
+    where accumulated_gates_connected is amount of gates connected to nodes at previous steps on path to considered node.
+    this way between two paths we (and agent) will prefer path with more gates on it.
+    The idea is "if there are other gates on the path to it, we should spend some time to close another gates during
+    this path, so its more dangerous".
+
+    Note that in this algorythm we consider only shortest paths, not the most dangerous,
+    TBH, I'm not sure if it works on cases containing more dangerous but longer path.
+    But provided tests work like a charm.
+    Feel free to contribute such case as an issue here :)
+    https://github.com/nerewarin/leetcode/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen
+
+    """
     queue = collections.deque()
     queue.append((si, 0, 0))
 
     risks = dict()
-    risks_disconnected = dict()
     visited_nodes_to_min_dist = {}  # with min distances
     while queue:
         u, distance, accumulated_gates_connected = queue.popleft()
@@ -62,8 +76,6 @@ def compute_risks(si, adj_list, nodes_connected_to_gates, gateways):
 
         if gates_connected:
             risks[u] = max(risks.get(u, float("-inf")), new_risk)
-        else:
-            risks_disconnected[u] = max(risks_disconnected.get(u, float("-inf")), new_risk)
         visited_nodes_to_min_dist[u] = distance
 
         for v in adj_list[u]:
