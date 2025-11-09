@@ -6,9 +6,6 @@ import collections
 import os
 import sys
 
-# Auto-generated code below aims at helping you parse
-# the standard input according to the problem statement.
-
 
 # n: the total number of nodes in the level, including the gateways
 # l: the number of links
@@ -59,7 +56,6 @@ def compute_risks(si, adj_list, nodes_connected_to_gates, gateways):
         else:
             gates_connected = 0
 
-        # new_risk = compute_risk_for_node(u, distance, nodes_connected_to_gates)
         new_risk = gates_connected - distance + accumulated_gates_connected
 
         accumulated_gates_connected += gates_connected
