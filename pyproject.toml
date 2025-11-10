@@ -5,7 +5,10 @@ description = ""
 authors = ["Gorbachev <a.gorbachev@cryptology.com>"]
 readme = "README.md"
 
-packages = [{include = "leetcode", from = "src"}]
+packages = [
+  { include = "leetcode",  from = "src" },
+  { include = "codingame", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.14"

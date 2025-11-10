@@ -12,6 +12,26 @@ import sys
 from pathlib import Path
 
 
+# near imports
+def _enable_utf8_streams():
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+
+def _icon(primary: str, fallback: str) -> str:
+    enc = (sys.stdout.encoding or "").lower()
+    return primary if "utf" in enc else fallback
+
+
+CHECK = _icon("✅", "[OK]")
+CROSS = _icon("❌", "[ERR]")
+SKIP = _icon("⏭️", "[SKIP]")
+NOTE = _icon("📋", "[NOTE]")
+
+
 def to_snake_case(filename):
     """Convert filename to snake_case."""
     # Remove .py extension for processing
@@ -205,6 +225,7 @@ def format_python_files(root_dir, dry_run=False, verbose=False, staged_only=Fals
 
 
 def main():
+    _enable_utf8_streams()
     parser = argparse.ArgumentParser(description="Convert Python filenames to snake_case")
     parser.add_argument(
         "root_dir",
