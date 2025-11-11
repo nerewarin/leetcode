@@ -16,7 +16,7 @@ def debug(msg):
 class FlagSpec(TypedDict):
     arg_name: str
     # not used for calling; just documentation
-    arg_type: Callable[[str], Any] | type
+    value_handler: Callable[[str], Any] | type
 
 
 class Path:
@@ -96,11 +96,15 @@ class Path:
         return type(self)(self.name, other)
 
 
+def _depth_parser(raw_flag):
+    return int(raw_flag.split(" ")[-1])
+
+
 class Tree:
     _valid_flags: dict[str, FlagSpec] = {
-        "-a": {"arg_name": "display_hidden", "arg_type": bool},
-        "-d": {"arg_name": "directories_only", "arg_type": bool},
-        "-L": {"arg_name": "depth", "arg_type": int},
+        "-a": {"arg_name": "display_hidden", "value_handler": lambda x: True},
+        "-d": {"arg_name": "directories_only", "value_handler": lambda x: True},
+        "-L": {"arg_name": "depth", "value_handler": _depth_parser},
     }
 
     def __init__(
@@ -244,16 +248,18 @@ class Tree:
         - -d: Only display directories (modifies the report line, see below).
         - -L depth: Limit the "depth" of the tree.
         Args:
-            f: str e.g. '-L,-e,-a'
+            f: str e.g. '-L -2,-e,-a'
 
         Returns:
 
         """
-        flags = {
-            value["arg_name"]: value["arg_type"](key)
-            for key, value in self._valid_flags.items()
-            if key in f.split(", ")
-        }
+        raw_flags = f.split(", ")
+        flags = {}
+        for raw_flag in raw_flags:
+            for key, value in self._valid_flags.items():
+                if raw_flag.startswith(key):
+                    flags[value["arg_name"]] = value["value_handler"](raw_flag)
+                    break
 
         return type(self)(self.root, **flags)
 
