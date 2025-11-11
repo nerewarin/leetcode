@@ -253,15 +253,20 @@ class Tree:
         Returns:
 
         """
-        raw_flags = f.split(", ")
+        flags = self._parse_flags(f)
+
+        return type(self)(self.root, **flags)
+
+    def _parse_flags(self, f: str) -> dict[Any, Any]:
+        raw_flags = f.split(",")
         flags = {}
         for raw_flag in raw_flags:
+            raw_flag = raw_flag.strip()
             for key, value in self._valid_flags.items():
                 if raw_flag.startswith(key):
                     flags[value["arg_name"]] = value["value_handler"](raw_flag)
                     break
-
-        return type(self)(self.root, **flags)
+        return flags
 
     def get_summary(self):
         if not self._summary_is_ready:

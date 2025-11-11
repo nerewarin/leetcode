@@ -4,7 +4,7 @@ import pytest
 
 from codingame.training.medium.advanced_tree import main
 
-cases = dirs = [p for p in pathlib.Path(__file__).parent.iterdir() if p.is_dir() and p.name.startswith("0")]
+cases = dirs = [p for p in pathlib.Path(__file__).parent.iterdir() if p.is_dir() and p.name[:2].isdigit()]
 
 
 # Write an answer using print
