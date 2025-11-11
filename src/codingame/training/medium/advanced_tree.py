@@ -113,7 +113,7 @@ class Tree:
         display_hidden: bool | None = False,
         directories_only: bool | None = False,
         depth: int | None = None,
-        root_exists: bool | None = False,
+        invalid_root: bool | None = False,
     ):
         self._root = root
         self._display_hidden = display_hidden  # -a : Display hidden directories and files.
@@ -124,7 +124,7 @@ class Tree:
         self._directories = 0
         self._files = 0
 
-        self.root_exists = root_exists
+        self.invalid_root = invalid_root
 
     def _clear_cache(self):
         self._summary_is_ready = False  # cache flag
@@ -220,7 +220,7 @@ class Tree:
             return line
 
         res = dfs(path=self.root, level=0, is_last_child=False)
-        if not self.root_exists:
+        if not self.invalid_root or not self.root.children:
             res += " [error opening dir]"
 
         self._summary_is_ready = True
@@ -243,6 +243,9 @@ class Tree:
 
             # +1 to cut / too
             path_relative_to_root = line[len(self.root.name) + 1 :]
+            if not path_relative_to_root:
+                continue
+
             parts = path_relative_to_root.split("/")
 
             path = self.root
@@ -251,7 +254,7 @@ class Tree:
                 new_path = path.get_or_add_child(new_path)
                 path = new_path
 
-        self.root_exists = root_exists
+        self.invalid_root = root_exists
 
     def filter(self, f: str):
         """
@@ -266,7 +269,7 @@ class Tree:
         """
         flags = self._parse_flags(f)
 
-        return type(self)(self.root, root_exists=self.root_exists, **flags)
+        return type(self)(self.root, invalid_root=self.invalid_root, **flags)
 
     def _parse_flags(self, f: str) -> dict[Any, Any]:
         raw_flags = f.split(",")
