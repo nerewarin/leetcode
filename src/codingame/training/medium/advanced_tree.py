@@ -32,6 +32,13 @@ class Path:
         self.children = children or []
         self.is_last_child = is_last_child
 
+    @property
+    def name_ignoring_dot(self):
+        name = self.name
+        while name.startswith("."):
+            name = name[1:]
+        return name
+
     def __str__(self):
         revered_path = [self.name]
         path = self
@@ -71,7 +78,7 @@ class Path:
 
             children.append(child)
 
-        res = sorted(children, key=lambda child: child.name)
+        res = sorted(children, key=lambda child: child.name_ignoring_dot)
         for i, r in enumerate(res):
             if i != len(res) - 1:
                 r.is_last_child = False
