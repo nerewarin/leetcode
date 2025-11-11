@@ -2,7 +2,7 @@
 https://www.codingame.com/training/medium/advanced-tree
 """
 
-from __future__ import annotations
+from __future__ import annotations  # for compatibility with Python 3.11 used in autograder
 
 import sys
 from collections.abc import Callable
@@ -248,7 +248,7 @@ class Tree:
 
             root_exists = True
 
-            # +1 to cut / too
+            # +1 to cut "/" too
             path_relative_to_root = line[len(self.root.name) + 1 :]
             if not path_relative_to_root:
                 continue
