@@ -186,8 +186,15 @@ class Tree:
 
     def build(self, text: list[str]):
         for line in text:
-            if not line.startswith(self.root.name):
-                continue
+            if self.root.name == ".":
+                pass
+            else:
+                this = "./"
+                if line.startswith(this) and not self.root.name.startswith(this):
+                    line = line[len(this) :]
+
+                if not line.startswith(self.root.name):
+                    continue
 
             # +1 to cut / too
             path_relative_to_root = line[len(self.root.name) + 1 :]

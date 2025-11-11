@@ -28,4 +28,11 @@ def test(input_path, expected_path):
         expected_output = output_file.read()[:-1]  # cut \n ending
 
     res = main(s, f, n, lines)
+    failed_res_path = expected_path.parent / "failed_res"
+    if expected_output != res:
+        with failed_res_path.open("w") as failed_res_file:
+            failed_res_file.write(res)
+    elif failed_res_path.exists():
+        failed_res_path.unlink()
+
     assert res == expected_output
