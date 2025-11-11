@@ -13,6 +13,17 @@ def debug(msg):
     print(msg, file=sys.stderr, flush=True)
 
 
+class DepthParserError(Exception):
+    pass
+
+
+def _depth_parser(raw_flag):
+    try:
+        return int(raw_flag.split(" ")[-1])
+    except ValueError as exc:
+        raise DepthParserError(f"for {raw_flag=}") from exc
+
+
 class FlagSpec(TypedDict):
     arg_name: str
     # not used for calling; just documentation
@@ -94,10 +105,6 @@ class Path:
     def __rtruediv__(self, other: Path):
         """Implements `other / self` (optional, for reversed operands)."""
         return type(self)(self.name, other)
-
-
-def _depth_parser(raw_flag):
-    return int(raw_flag.split(" ")[-1])
 
 
 class Tree:
@@ -278,7 +285,10 @@ class Tree:
             raw_flag = raw_flag.strip()
             for key, value in self._valid_flags.items():
                 if raw_flag.startswith(key):
-                    flags[value["arg_name"]] = value["value_handler"](raw_flag)
+                    try:
+                        flags[value["arg_name"]] = value["value_handler"](raw_flag)
+                    except DepthParserError:
+                        continue
                     break
         return flags
 
