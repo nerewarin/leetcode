@@ -274,9 +274,17 @@ class Tree:
         if not self._summary_is_ready:
             raise RuntimeError("Summary is not ready yet.")
 
-        summary = f"{self._directories} directories"
+        directories = self._directories
+        summary = str(directories)
+        if directories == 1:
+            summary += " directory"
+        else:
+            summary += " directories"
+
         if not self.directories_only:
-            summary += f", {self._files} files"
+            summary += f", {self._files} file"
+            if self._files != 1:
+                summary += "s"
 
         return summary
 
