@@ -20,10 +20,17 @@ class FlagSpec(TypedDict):
 
 
 class Path:
-    def __init__(self, name: str, parent: Path | None = None, children: list[Path] | None = None):
+    def __init__(
+        self,
+        name: str,
+        parent: Path | None = None,
+        children: list[Path] | None = None,
+        is_last_child: bool | None = False,
+    ):
         self.name = name
         self.parent = parent
         self.children = children or []
+        self.is_last_child = is_last_child
 
     def __str__(self):
         revered_path = [self.name]
@@ -64,7 +71,14 @@ class Path:
 
             children.append(child)
 
-        return sorted(children, key=lambda child: child.name)
+        res = sorted(children, key=lambda child: child.name)
+        for i, r in enumerate(res):
+            if i != len(res) - 1:
+                r.is_last_child = False
+            else:
+                r.is_last_child = True
+
+        return res
 
     def __truediv__(self, other: str):
         """Implements `self / other`."""
@@ -139,16 +153,24 @@ class Tree:
         self._depth = value
         self._clear_cache()
 
-    def _format_tree_element(self, path: Path, level: int, is_last_child: bool, is_last_level_0_child: bool) -> str:
+    @staticmethod
+    def _format_tree_element(path: Path, level: int, is_last_child: bool) -> str:
         string = ""
         for current_level in range(level):
+            parent = path
+            for i in range(level - current_level - 1):
+                if parent.parent is None:
+                    raise ValueError(f"there must be parent for {parent}!")
+                parent = parent.parent
+            parent_is_last_child = parent.is_last_child
+
             if current_level == level - 1:
                 if is_last_child:
                     string += "`-- "
                 else:
                     string += "|-- "
             else:
-                if is_last_level_0_child:
+                if parent_is_last_child:
                     string += "    "
                 else:
                     string += "|   "
@@ -158,8 +180,8 @@ class Tree:
     def as_string(self):
         self._clear_cache()
 
-        def dfs(path: Path, level: int, is_last_child: bool, is_last_level_0_child: bool):
-            line = self._format_tree_element(path, level, is_last_child, is_last_level_0_child)
+        def dfs(path: Path, level: int, is_last_child: bool):
+            line = self._format_tree_element(path, level, is_last_child)
 
             if level == 0:
                 pass
@@ -177,16 +199,13 @@ class Tree:
             first_children, last_child = children[:-1], children[-1:]
 
             for child in first_children:
-                line += "\n" + dfs(child, level + 1, False, is_last_level_0_child)
+                line += "\n" + dfs(child, level + 1, False)
             for child in last_child:
-                if level == 0:
-                    is_last_level_0_child = True
-
-                line += "\n" + dfs(child, level + 1, True, is_last_level_0_child)
+                line += "\n" + dfs(child, level + 1, True)
 
             return line
 
-        res = dfs(path=self.root, level=0, is_last_child=False, is_last_level_0_child=False)
+        res = dfs(path=self.root, level=0, is_last_child=False)
         self._summary_is_ready = True
         return res
 
@@ -248,7 +267,7 @@ def main(s, f, n, lines):
     if len(lines) != n:
         raise ValueError("lines must have length equal to n")
 
-    s = Path(s)
+    s = Path(s, is_last_child=True)
     tree = Tree(s)
     tree.build(lines)
     filtered_tree = tree.filter(f)
