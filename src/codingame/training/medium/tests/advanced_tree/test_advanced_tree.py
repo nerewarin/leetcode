@@ -25,18 +25,7 @@ def test(input_path, expected_path):
         n = int(n_)
 
     with expected_path.open("r") as output_file:
-        # tree = []
-        # _final_line_next = False
-        # final_line = None
-        # for line in output_file.read().splitlines():
-        #     if _final_line_next:
-        #         final_line = line
-        #         break
-        #     if line:
-        #         tree.append(line)
-        #     else:
-        #         _final_line_next = True
-        expected_output = output_file.read()
+        expected_output = output_file.read()[:-1]  # cut \n ending
 
     res = main(s, f, n, lines)
     assert res == expected_output
