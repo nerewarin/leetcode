@@ -139,7 +139,7 @@ class Tree:
         self._depth = value
         self._clear_cache()
 
-    def _format_tree_element(self, path: Path, level: int, is_last_child: bool) -> str:
+    def _format_tree_element(self, path: Path, level: int, is_last_child: bool, is_last_level_0_child: bool) -> str:
         string = ""
         for current_level in range(level):
             if current_level == level - 1:
@@ -148,15 +148,18 @@ class Tree:
                 else:
                     string += "|-- "
             else:
-                string += "|   "
+                if is_last_level_0_child:
+                    string += "    "
+                else:
+                    string += "|   "
 
         return string + path.name
 
     def as_string(self):
         self._clear_cache()
 
-        def dfs(path: Path, level: int, is_last_child: bool):
-            line = self._format_tree_element(path, level, is_last_child)
+        def dfs(path: Path, level: int, is_last_child: bool, is_last_level_0_child: bool):
+            line = self._format_tree_element(path, level, is_last_child, is_last_level_0_child)
 
             if level == 0:
                 pass
@@ -174,13 +177,16 @@ class Tree:
             first_children, last_child = children[:-1], children[-1:]
 
             for child in first_children:
-                line += "\n" + dfs(child, level + 1, False)
+                line += "\n" + dfs(child, level + 1, False, is_last_level_0_child)
             for child in last_child:
-                line += "\n" + dfs(child, level + 1, True)
+                if level == 0:
+                    is_last_level_0_child = True
+
+                line += "\n" + dfs(child, level + 1, True, is_last_level_0_child)
 
             return line
 
-        res = dfs(path=self.root, level=0, is_last_child=False)
+        res = dfs(path=self.root, level=0, is_last_child=False, is_last_level_0_child=False)
         self._summary_is_ready = True
         return res
 
